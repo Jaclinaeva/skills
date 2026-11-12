@@ -24,6 +24,11 @@ converter needs to know before touching it.
 **Proof:** <the component you looked up, and one real prop or slot you read
 back from it>
 
+**Membership authority:** <where the list of what's in the design system
+lives, e.g. a docs site, a library, a designer's artifact>. Code tells you a
+component exists; only this tells you it's in the system. When code and this
+list disagree, the list decides the tier and the disagreement is a finding.
+
 Everything below is `[verified]` unless tagged otherwise.
 
 ---
@@ -50,6 +55,17 @@ Everything below is `[verified]` unless tagged otherwise.
 shadow root, easy to miss, page looks broken without them): …
 
 **Version pinning:** floating `@latest` | pinned. <Which, and why.>
+
+**Fonts outside the browser.** Fill this in when the system font is
+licensed or can't be loaded from a URL:
+
+- **Page stack:** `font-family: "<system font>", "<stand-in>", <generic>`.
+  The system font renders where it's installed; the stand-in covers everyone
+  else. Never embed the licensed font's files.
+- **Design-tool stand-in:** when a design tool can't load the system font,
+  write text in the stand-in and name each text layer
+  `(<system font> <text style name>)`, e.g. `(Brand Sans text-sm/Medium)`,
+  so a person or a local plugin can swap it to the real style.
 
 **Tested:** <yes, rendered `<ds-button>` and it looked right> | `[untested]`
 <and why not>

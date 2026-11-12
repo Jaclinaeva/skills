@@ -134,6 +134,26 @@ Run the four phases in order. Give a one-line status between each.
 6. **Phase 4 — Proof** (`phases/phase-4-proof.md`). Validate it, count what
    changed, write the receipt.
 
+### Quick mode (a flag on Mode 1)
+
+For re-runs and small changes, when the user says "quick" or the page has
+been converted before. Same four phases, lighter:
+
+- **Profile:** reuse `SYSTEM.md` without re-checking it, unless something
+  fails.
+- **Posture:** reuse the last run's posture; don't ask again.
+- **Phase 1:** regions and states only. No tells, no before-counts.
+- **Phase 2:** use only components already in the profile. Anything else is
+  a gap; don't read new component source to fill it.
+- **Phase 3:** unchanged, markers included.
+- **Phase 4:** the counts, the marker check, and one render at desktop
+  width of the default state. Skip the other widths and states, and the
+  human review step, and say so in the receipt.
+- **Receipt:** the short form in `phases/phase-4-proof.md`.
+
+Quick mode never skips the ground rules. It's the same honesty with less
+ceremony.
+
 ### Mode 2 — Build or refresh the system profile
 
 Run `intake/SYSTEM-INTAKE.md` on its own. Also the right move when the system
@@ -203,6 +223,8 @@ Either way, `vibe-killer/` keeps the paper trail.
 - `phases/phase-2-mapping.md` — region to component, with evidence
 - `phases/phase-3-conversion.md` — write the page
 - `phases/phase-4-proof.md` — validate, count, and write the receipt
+- `phases/drift-check.md` — how phase 4 checks markers against a catalog
+- `tools/drift-check.mjs` — the check itself (Node and Chrome)
 - `templates/system.md`, `templates/autopsy.md`, `templates/receipt.md` —
   output shells
 

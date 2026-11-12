@@ -4,6 +4,7 @@
 HTML | rendered DOM | screenshot>
 **System:** <name> @ <version> · **Profile:** `vibe-killer/SYSTEM.md`
 (verified <date>)
+**Source type:** <vibe-coded page | styled prototype | wireframe>
 **Posture:** <A: system's rules win | B: follow the original's lead>
 **Date:** <YYYY-MM-DD>
 
@@ -13,6 +14,8 @@ HTML | rendered DOM | screenshot>
 ---
 
 ## Tells found
+
+*Vibe-coded pages only. Counts: vibe-coded pages and styled prototypes.*
 
 **<N> of 30.**
 
@@ -38,6 +41,15 @@ HTML | rendered DOM | screenshot>
 
 | # | Region | What it's for | Content it carries | Notes |
 |---|---|---|---|---|
+
+---
+
+## States
+
+| # | Region | State | Original treatment | New treatment |
+|---|---|---|---|---|
+
+**Lost distinctions:** <none, or each one, also at the top of the receipt>
 
 ---
 
@@ -78,6 +90,7 @@ catalog being wrong, and it's worth drafting as a gap.
 
 ## Content flagged for a human
 
-**Unverifiable claims** (statistics, testimonials, names, logos, awards):
+**Unverifiable claims** (statistics, testimonials, names, logos, awards;
+for prototypes and wireframes, just "Sample data, carried across unchanged"):
 
 **Copy tells** (noted, not touched):

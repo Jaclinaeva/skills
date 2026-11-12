@@ -65,7 +65,11 @@ great outcome; this section being *missing* is a broken receipt.
 
 <Every statistic, testimonial, logo and name from the original. These read as
 real and were very likely invented. Nothing was deleted and nothing was
-verified.>
+verified. For prototypes and wireframes: "Sample data, carried across
+unchanged.">
+
+**Lost distinctions:** <none, or each state pair the conversion merged>
+
 
 **Copy tells noted, not touched:**
 
@@ -79,6 +83,7 @@ verified.>
 | Rendered in a browser | <yes, at 320 / 768 / 1280, or **not rendered, and why**> |
 | Human visual review | <who looked and what they found, or **no human review**> |
 | Catalog corrections | <n confirmed · n overturned after rendering> |
+| States kept distinct | <n of n, or **each lost distinction**> |
 | Line length | <widest prose measured at N characters per line> |
 | Spacing | <no adjacent siblings at 0px, or where> |
 | Deterministic counts | <measured, or estimated from a screenshot> |

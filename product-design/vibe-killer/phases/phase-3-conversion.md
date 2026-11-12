@@ -44,7 +44,10 @@ Two failure modes worth naming, because both are silent:
 
 - **Fonts.** A theme's tokens usually just *name* a family. Load tokens
   without the theme's font stylesheet and every heading renders in a
-  fallback serif, with no error anywhere.
+  fallback serif, with no error anywhere. If the system font is licensed
+  and can't be loaded from a URL, use the stand-in stack from `SYSTEM.md`
+  section 2 (system font first, then the stand-in), and never embed the
+  licensed font's files.
 - **Version drift.** If the runtime floats on a `latest` tag and the profile
   was captured weeks ago, the model composing your markup and the browser
   loading the components may disagree about what exists. Pin the version for
@@ -78,6 +81,50 @@ Follow the mapping table in document order. For each region:
   at one `<h1>`, real buttons and links, real labels on form fields, real
   alt text. You're rebuilding the markup, so rebuild it correctly.
 
+### Mark every component
+
+Put these attributes on the root element of every component instance, so
+later steps can tell which component it is without guessing from markup:
+
+```html
+<button data-component="ButtonComponent"
+        data-props='{"variant":"primary","size":10}'>Save</button>
+```
+
+- `data-component`: the component's exact name from the catalog.
+- `data-props`: the constructor arguments the mapping set, as JSON. Leave out
+  defaults. Never slots.
+- `data-slots`: the slots this instance fills, as a JSON list of names, e.g.
+  `'["left","right"]'`. A slot is content passed into the component, not
+  an argument, so an engineer must never see it in `data-props`.
+- `data-tier`: where the component stands. Leave it off for a component the
+  design system documents. Use `code` for one that exists in code but isn't
+  documented in the design system yet. Use `proposed` for a gap, with the
+  name prefixed `proposed:`.
+- `data-note`: optional, one line, for a reviewer. A gap's note says what
+  was proposed upstream.
+
+```html
+<div data-component="proposed:Stepper" data-tier="proposed"
+     data-note="No stepper exists. Proposed upstream, not filed.">…</div>
+```
+
+When a component renders another (a button that renders an icon button, a
+table builder that renders a table), mark the outer one, the one the call
+site instantiates. Mark the inner one too only when its root is a separate
+element.
+
+Where a region shows a state from the autopsy's states table, mark it too:
+
+```html
+<td data-state="price-cell:own">…</td>
+```
+
+The format is `<region>:<state>`, using the names from the states table.
+These markers are what the Figma round trip and state building read, so
+they're required, not decoration. Web-component systems already name the
+component in the tag; mark them anyway, so every system reads the same way.
+
 When you genuinely need an inline style for something dynamic, use the
 system's custom properties and nothing else:
 
@@ -102,6 +149,9 @@ Three legitimate moves, and one that isn't.
 <!-- VIBE-KILLER GAP: pricing toggle. No toggle-group component exists.
      Proposed upstream (not yet filed). Placeholder below is two buttons. -->
 ```
+
+The placeholder's root also gets `data-component="proposed:<Name>"` and
+`data-tier="proposed"`, so tools can find every gap without reading comments.
 
 **Not legitimate:** writing the CSS yourself. That is the failure this skill
 exists to prevent, it will be invisible in six months, and it converts the

@@ -38,7 +38,7 @@ Every region gets exactly one:
 | **Template** | This region comes from a whole-page template the system publishes |
 | **Delete** | Decorative, dead, or duplicated. Removing it is the right answer |
 | **Gap** | The system doesn't cover it. Name it, propose it, placeholder it |
-| **Keep** | Intentionally outside the system: a third-party embed, a legally required block, a piece of custom art direction the human asked to preserve |
+| **Keep** | Intentionally outside the system: a third-party embed, a legally required block, a piece of custom art direction the human asked to preserve, or a prototype control (keep it exactly as it was) |
 
 **Delete and Keep both need a one-line reason.** A deletion nobody can
 account for looks like an accident, and a Keep with no rationale is just
@@ -67,6 +67,20 @@ pages.
 Then check the **don'ts**. If the catalog's own guidance warns against the
 component you picked, take the correction and record both: what you reached
 for first and what the catalog said instead.
+
+### When the page is already marked
+
+A styled prototype often arrives with `data-component` markers, and sometimes
+with its own list of which components are in the design system. Check them;
+don't overrule them.
+
+- **Tiers.** `SYSTEM.md` names the authority on what the design system
+  contains. When the page's own list disagrees with that authority, report
+  each disagreement and ask. Never edit the page's list, because it's the
+  designer's statement, and the profile may be the stale one.
+- **Wrappers.** When a marked component renders another one inside it, the
+  marker names the outer component, the one a call site instantiates. That's
+  correct, not a wrong name. Don't rename it to the inner component.
 
 **Mark it unconfirmed until phase 4.** A catalog's usage notes are a claim
 about how a component behaves, and they can be wrong. A component can be
@@ -113,6 +127,25 @@ than a reading of it, and the receipt will say so at the top.
 
 ---
 
+## Keep every state distinct
+
+Go through the states catalogued in phase 1. Each one must map to its own
+treatment: a variant, a token, an icon, or a text label. Record it:
+
+| # | Region | State | Original treatment | New treatment |
+|---|---|---|---|---|
+| 1 | Plan comparison cell | included | tick | `ds-icon name="check"` |
+| 1 | Plan comparison cell | add-on | bold price | `--ds-color-content-default`, medium weight |
+| 1 | Plan comparison cell | not available | faint dash | dash, `--ds-color-content-subtle` |
+
+If two states end up with the same treatment, that is a **lost
+distinction**. It's the most serious failure a conversion can have, because
+the page stops saying something it used to say. Try another token or a
+label first. If the system truly can't separate them, record it as a gap,
+and put it at the top of the receipt. Never file it as a token note.
+
+---
+
 ## Tokens
 
 Same job at the value level. Map the page's hardcoded values to real tokens,
@@ -145,6 +178,10 @@ When the system genuinely lacks something:
   component is, and why it doesn't cover the case.
 - Propose it upstream. Draft the issue. **File it only if the human says
   to.** Filing is their call.
+- Shape the proposal the way the system grows. Read the system's own
+  guidance on component design first. Many systems prefer composing a new
+  small component over adding an option to an existing one. Propose a new
+  prop or variant only when composition can't do it, and say why.
 - Decide what phase 3 does in the meantime: use the nearest component and
   accept the difference, or leave a clearly marked placeholder. Never
   hand-roll a replacement component quietly. A gap that gets silently filled

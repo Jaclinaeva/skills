@@ -1,0 +1,21 @@
+<title>{{TITLE}}</title>
+<meta name="robots" content="noindex, nofollow">
+<script src="https://cdn.tailwindcss.com/3.4.17?plugins=container-queries"></script>
+<script>
+/*SETUP*/
+</script>
+<style>
+  /* Lookout has one light look; the page commits to it. */
+  :root { color-scheme: light; }
+  body { background: #FFFFFF; color: #333570; }
+  [hidden] { display: none !important; }
+  table { border-spacing: 0; }
+  /* Links, from the app's elements.scss: royal, underlined on hover. Components override with their own classes. */
+  a { cursor: pointer; color: #0034E5; text-decoration: none; }
+  a:active, a:focus, a:hover { color: #0029B2; text-decoration: underline; }
+  details > summary::-webkit-details-marker { display: none; }
+
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+<div id="app"></div>
+<div id="toast" class="fixed left-1/2 -translate-x-1/2 bottom-6 z-[60] w-[min(42rem,calc(100%-32px))] flex justify-center" hidden></div>

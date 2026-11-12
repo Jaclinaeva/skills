@@ -92,7 +92,18 @@ grep -oE 'var\(--<prefix>[a-z0-9-]+\)' converted.html | sort | uniq -c | sort -r
 
 # System components used
 grep -oE '<ds-[a-z-]+' converted.html | sort | uniq -c | sort -rn
+
+# Component markers: should match the components used
+grep -oE 'data-component="[^"]+"' converted.html | sort | uniq -c | sort -rn
 ```
+
+**Every component needs a marker.** If the marker count is lower than the
+number of component instances, find the unmarked ones and mark them before
+writing the receipt.
+
+When the profile names a catalog, run the drift check
+(`phases/drift-check.md`) on the converted page and fix what it finds before
+writing the receipt.
 
 Swap in the real prefix and tag pattern from `SYSTEM.md`. Adapt for a
 class-based or React system; the point is a real number, not this exact
@@ -179,6 +190,20 @@ Show the user:
 
 Then stop. The conversion is done. If they want another page, that's another
 run.
+
+---
+
+## Quick mode receipt
+
+In quick mode, write `receipt.md` with only these sections:
+
+1. **Changes:** what was converted or changed this run, in a short list.
+2. **Components used:** names and counts.
+3. **States:** n of n kept distinct, and any lost distinction.
+4. **Gaps:** new ones only, each in one line.
+5. **Not checked:** the widths, states and reviews quick mode skipped.
+
+No before/after table, no course lessons. Keep it to one screen.
 
 ---
 

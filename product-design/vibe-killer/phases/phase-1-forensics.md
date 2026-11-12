@@ -34,7 +34,25 @@ downstream inherits it.
 
 ---
 
+## Name the source type
+
+Ask, or tell from the source, which kind of page this is. It decides how
+much of this phase applies:
+
+| Type | Example | Tells and before-counts |
+|---|---|---|
+| **Vibe-coded page** | An AI-generated landing page | Run both in full |
+| **Styled prototype** | A designer's clickable prototype in near-final styling | Counts only; skip the tells |
+| **Wireframe** | A deliberate greyscale prototype | Skip both. One line: "Wireframe: bespoke CSS is intentional scaffolding" |
+
+Record the type at the top of the autopsy. For prototypes and wireframes,
+the regions and the states below are the whole value of this phase.
+
+---
+
 ## Catalog the tells
+
+*Vibe-coded pages only.*
 
 Work through `reference/THE-TELLS.md` and record every hit. One row each:
 
@@ -111,6 +129,29 @@ Some judgment calls that come up every time:
 - **Repeated markup** gets one row with a count, not N rows. Three
   hand-written identical cards are one pattern that happened three times,
   and saying so is half the argument for the conversion.
+- **Prototype controls** (screen switchers, variant or "shape" toggles,
+  reviewer notes) aren't part of the product. Give them a row marked
+  "prototype control" so phase 2 keeps them unchanged.
+- **A prototype toolbar** marked `data-proto-ui` (a states navigator, a
+  component highlight switch) is prototype chrome. Never convert, mark or
+  count anything inside it. If it holds a list of states, that list is the
+  designer's own states catalog: start from it.
+
+---
+
+## Catalog the states
+
+List every distinct state the page shows, wherever it uses a visual
+difference to carry meaning: selected vs not, statuses, and especially
+comparisons (e.g. a plan table where a cell can be "included", "add-on"
+or "not available"). One row each:
+
+| # | Region | States | How the original tells them apart |
+|---|---|---|---|
+| 1 | Plan comparison cell | included · add-on · not available | tick · bold price · faint dash |
+
+This list is a contract. Phase 2 must give every state its own treatment,
+so a page that loses a distinction loses it visibly.
 
 ---
 
@@ -123,6 +164,9 @@ and press mention. Vibe-coded pages invent these freely and they read as
 real. Carry them across as written, and put every one in this list so a
 person decides what happens to them. Never present an invented number as a
 fact in a converted page and never quietly delete one either.
+
+Skip this list for prototypes and wireframes, whose data is sample data by
+design. One line is enough: "Sample data, carried across unchanged."
 
 **Copy tells.** The tricolon headline, the empty superlatives, the sparkles.
 Note them, don't touch them. Rewriting the words is a different job.

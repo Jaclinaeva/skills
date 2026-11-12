@@ -1,0 +1,168 @@
+{
+ "_about": "Lookout library pieces the Figma builder uses. Keys are from the 03 Components library and the libraries Connected care already uses; refresh them when the library changes.",
+ "textStyles": {
+  "text-2xs/Regular": "b09d26137738a6cb84d7f27d5f0cb2d674c30308",
+  "text-2xs/Medium": "731383dc89c97bcfcd825b280221d118d201b9dc",
+  "text-xs/Regular": "c493eba71cd369a3aa7df6c060eb32e362de3b02",
+  "text-xs/Medium": "4328451b6cb16ea69f69541e71cd12a7e17e6593",
+  "text-xs/Bold": "df92b2fbc514c3ce95496f81d73f390452029cb0",
+  "text-sm/Regular": "52b66d45259c26097c41169a65f9c392fd64d8fc",
+  "text-sm/Medium": "574020cb04bae2a9813553eaf1d8b78b0dca0f76",
+  "text-sm/Bold": "e0af63b748f7e993995122f0eae7ac052d85901d",
+  "text-md/Regular": "a64db69ab4c25ece9eb952d4b7a187847476737b",
+  "text-md/Medium": "2bb90bc2d8de49dad8f855191cb9965741ff7213",
+  "text-base/Regular": "eed9007a7b98d32395675ccd981850d916743ad2",
+  "text-base/Medium": "f98f8e3ed6b1d5e5031cbcfaf191eeff242540b7",
+  "text-base/Bold": "7431dc1d43f96695d359b6adc5f4c1ea9ffdf418",
+  "text-lg/Regular": "46a02ce1e329b94b0f787526672dc1176ea9032d",
+  "text-lg/Medium": "4bf3229ec52ba6e2fd886e6c42d87ca5f261b339",
+  "text-lg/Bold": "cbe500ab65378145ff984a657e8b16c47da8b21c",
+  "text-xl/Regular": "64c87661b89a95c157913e1b71f6e220d6b650af",
+  "text-xl/Medium": "971371d95b125146c5118793525b363d6cbdbad6",
+  "text-2xl/Regular": "feb13899dd2a0728199dbc4a1da7df39542f4d84",
+  "text-2xl/Medium": "2770b60d34a2d2c3343e5b9d3a23f1f54961c45a",
+  "text-2xl/Bold": "dff679c14442d251cd69a878d2f24ea449426e99",
+  "text-3xl/Regular": "0412f6e279b53c4a4e0dfed2166be3ecad247e96",
+  "text-3xl/Medium": "7e9aadb548dd63e920b7baf6f535bb0efbba10c6",
+  "text-4xl/Regular": "c3b969ce38ae5d07c13ed40d0dd26bed64af73d7",
+  "text-4xl/Medium": "b4fc569f21db317c0c21fc1ddb4524cfce7c79ba",
+  "text-4xl/Bold": "7a5467ea226df40c1b05e20a92ba711c2e119644",
+  "text-5xl/Regular": "fee8ea072b1119c4f8d9431ee5a4055e0fed2e29",
+  "text-5xl/Medium": "107fbd2344b1e60f30eadf2166252a9fce2a99ed"
+ },
+ "sizes": [
+  [
+   10.4,
+   "text-2xs"
+  ],
+  [
+   12,
+   "text-xs"
+  ],
+  [
+   14,
+   "text-sm"
+  ],
+  [
+   15,
+   "text-md"
+  ],
+  [
+   16,
+   "text-base"
+  ],
+  [
+   18,
+   "text-lg"
+  ],
+  [
+   20,
+   "text-xl"
+  ],
+  [
+   24,
+   "text-2xl"
+  ],
+  [
+   30,
+   "text-3xl"
+  ],
+  [
+   36,
+   "text-4xl"
+  ],
+  [
+   48,
+   "text-5xl"
+  ]
+ ],
+ "icons": {
+  "question_stroke": "4997f7c0558c2c273c341794134d9799bdefdddb",
+  "question_solid": "284c179f435c3e95adb91d9073f32c78268fa4f7",
+  "calendar_time_stroke": "a7a1085e0158447ae6c4cbd76c1c3d2388af6b43",
+  "calendar_stroke": "776bd9f3be9d991abafa0794c787ac2c873879e2",
+  "chat": "d08d21f200f1f35fbbab1e80fcf3036e484b3901",
+  "chat_stroke": "d08d21f200f1f35fbbab1e80fcf3036e484b3901",
+  "group_team": "926049e48c57f1e97ab2eee118af6929547889da",
+  "map_stroke": "80d15b8ccb8304497827aaa858efd64e1e049e2f",
+  "map_solid": "652b6b50b8097244cfe4bb6a358b95556e66ce8d",
+  "handheart_stroke": "61c902f6c456fe450ac409a6325f57da897eab81",
+  "chevron_down": "782924f3a17d167913c6ece68b7b079c9ac98cac",
+  "chevron_left": "6c532b672f69b9e7dfc8af6136037c23d069ca74",
+  "file_dollar_stroke": "1da86622059d0107f40a7361485fb9d320f3b739",
+  "add": "6e6f625f02ca2e54bc22336a75e80abce9851ea9",
+  "add_solid": "6e6f625f02ca2e54bc22336a75e80abce9851ea9",
+  "add_stroke": "014e1ea5016c3dd155da51110a8d2ffcf38aafc9",
+  "edit": "caa456472fc2cd0e798b9786d7521140572f39ff",
+  "pencil": "3891960391ff856128ddcdde71794086a7b3e971",
+  "trash": "613756384a6505ec5ffc8d4b3f43ed3aa4c6b1e9",
+  "cross_small": "610732f8271bcf682cd4eae8aed16773a44b56d8",
+  "cross_large": "79522d1405cc90f36eb79d94bbb8e289f78497d6",
+  "check_small": "f6c28f0eadb037dd903362473fff437fd139bdca",
+  "check_large": "127b83d151a08c6d120c5ff8a47a3fc8ed7448a9",
+  "info_stroke": "d81aadc342120b0ee7e6d508f863867c57da2c46",
+  "info_solid": "bd08d14b87cf3405a75905814c56945a4beabd3b",
+  "warning_stroke": "0c8b00ec14b7fe416f18006cf61af027c269f38c",
+  "warning_solid": "baec8c348d82cf6194cb88204510c5cb2f0f31b6",
+  "search": "b8d784aaa053a89c08c772743ed54d2295973933",
+  "overflow": "b83b5383e0c337fc0bf1d7bb0d09585e6ed9b774",
+  "download": "7ac4a9a59cfa477461537c60fa63dc28c2ef45e0",
+  "upload_cloud": "cad5d58a907927916d1ca597ef2793cabbd83fa1",
+  "download_cloud": "e9518f7f1140b734e0c5fc195840edc0edc4775e",
+  "clock_stroke": "2a4c9ef6ab0a47a55a074834741309033fa4c669",
+  "eye_stroke": "966499c0b23b276c2f94f43bfb519c89b7781b31",
+  "eye_off_stroke": "6ea0a0a5f3bf2ebcc0ce9d014c083ddd2a3ef9cf",
+  "filter_stroke": "5d773b0fed67a11cd3b74aadef5f36ca699143af",
+  "lock_stroke": "622d44090d85a4244d83abb3891e49127d7a8e6c",
+  "cog_stroke": "4634bca75ed7ec9805e2370b4c717dbe3c8629cc",
+  "email_stroke": "f3215303376ac842e25c4218c65654ec6acbf5d1",
+  "flag_stroke": "7610eccfa47bb7af6f782352edd3b35936e0fb32",
+  "repeat": "a62f532661472942669828687cb5602f7cadb6f9",
+  "copy": "c9a3d2fb2ea23056aea45df1ff6f071379f75498",
+  "confirm_stroke": "aad67f1b766ce06470bfeef6c7adbd49b5428ff7",
+  "confirm_solid": "1c5a194f1a9cddca38795f00f9619bfced56acd3",
+  "deny_stroke": "2fbb6b2c580cde27b7faa47567f361c62731aef0",
+  "dollars": "6d3337cd44af4c2a5bc905dd92dc64e4997d10cc",
+  "undo": "41b902ef19d14fa74baf7f83882075b510be5c7a",
+  "logo": "1ffe71e2e051ecb180c9126820094fe7397bab7f"
+ },
+ "components": {
+  "Admin::ButtonComponent": {
+   "prop": "variant",
+   "default": "secondary",
+   "variants": {
+    "primary": "8553456fb4bb0c34a3db24cdc6d441765210a6e2",
+    "secondary": "08fcf2d90c98fae0ee71137b040202694391d6ec",
+    "destructive": "aa45119e50220ac0910f8e1d52c5d80166e4c2cd"
+   },
+   "small": {
+    "secondary": "95ae807087370ff1d667a9e3aed94f6caba6f85f"
+   },
+   "text": true,
+   "hide": [
+    "Show icon"
+   ]
+  },
+  "Admin::TagComponent": {
+   "prop": "color",
+   "default": "charcoal",
+   "variants": {
+    "butterscotch": "afba37b09b0a7cf84d6cc5cfb3931c53bc9d6f4e",
+    "royal": "e110fb3fc17c7c3cd953d274ee2fc5ac709fc866",
+    "warning": "fc59664a703e5e868699b273aa898b2b4bd06707",
+    "emerald": "d203a9dd426fdbff48f40c36bbf1bacdb3216394"
+   },
+   "text": true
+  }
+ },
+ "inputs": {
+  "checkbox": {
+   "default": "c01c04765121965574e5e0ddd500da87389dfe7d",
+   "checked": "067400cb5418ad07a1f77e6161b959d8880a1643"
+  },
+  "radio": {
+   "default": "cc8ece48a319003961a3ec09e89f52ca4239e8d1",
+   "checked": "4d0cbe96e3e90dab79dc4fa3721e6500279f0560"
+  }
+ }
+}
