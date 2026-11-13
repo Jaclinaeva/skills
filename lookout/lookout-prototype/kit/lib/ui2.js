@@ -35,7 +35,7 @@
     return '<nav ' + dc('Admin::SegmentControlsComponent', null, 'code') + ' class="bg-grey-lighter border-grey-light border rounded-md border-solid flex-row flex w-fit max-w-full overflow-x-auto">' + items.map(function (t) {
       var on = t[0] === active, warn = (t[0] === 'error' || t[0] === 'need') && t[2] > 0;
       var label = t[2] != null ? '<div class="flex items-center justify-center gap-2"><div>' + t[1] + '</div>' + T2.count(t[2], warn) + '</div>' : t[1];
-      return '<button type="button" ' + dc('Admin::SegmentComponent', { active: on }, 'code') + ' data-a="' + action + '" data-v="' + t[0] + '" class="font-medium text-center hover:no-underline min-w-32 h-10 px-5 flex-auto text-sm px-3 py-2 border rounded-md border-solid whitespace-nowrap cursor-pointer ' + (on ? 'bg-white border-grey-light text-royal hover:text-charcoal' : 'bg-transparent border-transparent text-charcoal hover:text-royal') + '">' + label + '</button>';
+      return '<a href="javascript:void(0)" ' + dc('Admin::SegmentComponent', { url: '#', active: on }, 'code') + ' data-a="' + action + '" data-v="' + t[0] + '"' + (on ? ' aria-current="page"' : '') + ' class="font-medium text-center hover:no-underline min-w-32 h-10 px-5 flex-auto text-sm px-3 py-2 border rounded-md border-solid whitespace-nowrap cursor-pointer ' + (on ? 'bg-white border-grey-light text-royal hover:text-charcoal' : 'bg-transparent border-transparent text-charcoal hover:text-royal') + '">' + label + '</a>';
     }).join('') + '</nav>';
   };
 })();

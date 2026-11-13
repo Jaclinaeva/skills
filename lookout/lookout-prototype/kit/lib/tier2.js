@@ -36,7 +36,7 @@ var T2 = (function () {
   function tabs(items, active, action) {
     return '<div ' + dc('Admin::TabbedHeaderComponent', null, 'code') + ' class="flex-row flex space-x-6 flex-nowrap overflow-x-auto">' + items.map(function (t) {
       var on = t[0] === active, label = t[2] != null ? '<div class="flex items-center gap-2"><div>' + t[1] + '</div>' + count(t[2], t[3] && t[2] > 0) + '</div>' : t[1];
-      return '<button type="button" ' + dc('Admin::TabComponent', { active: on }, 'code') + ' data-active="' + on + '" class="' + TAB + '"' + (action ? ' data-a="' + action + '" data-v="' + t[0] + '"' : ' tabindex="-1"') + '>' + label + '</button>';
+      return '<a href="javascript:void(0)" ' + dc('Admin::TabComponent', { url: '#', active: on }, 'code') + ' data-active="' + on + '" class="' + TAB + '"' + (action ? ' data-a="' + action + '" data-v="' + t[0] + '"' : '') + (on ? ' aria-current="page"' : '') + '>' + label + '</a>';
     }).join('') + '</div>';
   }
   // In-page view switches. Pass 1 uses TabComponent, as Admin::Rates::TabbedHeaderComponent does for Active / Archived.

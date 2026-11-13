@@ -22,6 +22,12 @@
 // The catalog: { "generated": {…}, "components": { "Name": { args, required, positional, anyArgs, slots, tier } } }
 //   tier is "ds" (in the design system) or "code". args null means the arguments couldn't be read.
 //
+// Accessibility and copy, checked in every state unless --no-qa (reported, never failed):
+//   accessibility  axe-core's WCAG 2.2 AA rules, loaded from a pinned CDN address. Page-level rules about the
+//                  prototype file itself (its <html lang>, <title>, skip links, viewport) are left out, and so is
+//                  the app's own navigation (Admin::PrimaryNav, Vendor::Nav), which is the same on every page.
+//   copy           visible text against the writing guide's confirmed rules and terminology table.
+//
 // Writes <out>/drift-report.md and drift-report.json. Exits 1 when there are errors (or warnings, with --strict).
 import fs from 'node:fs';
 import path from 'node:path';
@@ -113,12 +119,89 @@ function checkMarker(m, where) {
   if (c.args === null) add('info', 'unchecked', `${m.name}: its arguments couldn't be read from source, so its props weren't checked`, where);
 }
 
+// ---------- accessibility and copy ----------
+// Each state renders from a copy of the page with axe-core and a copy scan added at the end. Both run once the
+// state has settled, and leave their findings in script#qa-results, which the marker checks ignore.
+const QA = !flag('--no-qa');
+const AXE = 'https://cdn.jsdelivr.net/npm/axe-core@4.10.2/axe.min.js';
+const wait = +opt('--wait', 5000);
+const QA_SCRIPT = String.raw`
+(function () {
+  // The app's own navigation is the same on every page and isn't the prototype's design.
+  var NAV = '[data-component="Admin::PrimaryNav::Component"], [data-component="Vendor::Nav::Component"]';
+  var ACRONYMS = /^(NDIS|GST|ABN|ABNS|AUD|PDF|CSV|XLSX|SAH|HCP|CHSP|DVA|DEX|NSW|VIC|QLD|ACT|API|URL|ID|IDS|SMS|FAQ|AT-HM|PO|POS|TAX)$/;
+  var CHECKS = [
+    ['staffer', /[a-z,;] Staffers?\b/],
+    ['member', /\bmembers?\b/],
+    ['helper', /\bhelpers?\b/],
+    ['term', /\b(patients?|residents?|customers?|carers?|staff members?|back office|web app)\b/i],
+    ['term', /\bworkers?\b/],
+    ['please', /\b(please|simply)\b/i],
+    ['spelling', /\b(organiz\w*|colors?|centers?|prioritiz\w*|canceled|canceling|enroll|enrolls|catalogs?)\b/i],
+    ['date', /\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]* \d{1,2},? \d{4}\b/],
+    ['confirm', /\bare you sure\b/i]
+  ];
+  function hidden(el) {
+    for (var e = el; e && e.nodeType === 1; e = e.parentElement) { var cs = getComputedStyle(e); if (cs.display === 'none' || cs.visibility === 'hidden') return true; }
+    var r = el.getBoundingClientRect(); return r.width <= 1 && r.height <= 1;
+  }
+  function copy() {
+    var app = document.querySelector('[data-component="Vendor::Layout::Component"]') ? 'portal' : 'admin', out = [], seen = {};
+    function add(rule, text) { var k = rule + '|' + text; if (!seen[k]) { seen[k] = 1; out.push({ rule: rule, text: text.slice(0, 140) }); } }
+    var walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    for (var n = walk.nextNode(); n; n = walk.nextNode()) {
+      var el = n.parentElement, t = n.textContent.replace(/\s+/g, ' ').trim();
+      if (!t || !el || el.closest('script,style,[data-proto-ui]') || el.closest(NAV) || hidden(el)) continue;
+      if (getComputedStyle(el).textTransform === 'uppercase') add('uppercase', t);
+      (t.match(/(?<![\w-])[A-Z]{4,}(?![\w-])/g) || []).forEach(function (w) { if (!ACRONYMS.test(w)) add('allcaps', t); });
+      CHECKS.forEach(function (c) { if (c[1].test(t)) add(c[0], t); });
+      if (app === 'admin' && /\bjobs?\b/i.test(t)) add('visit-job', t);
+      if (app === 'admin' && /\bclients?\b/i.test(t)) add('term', t); // the supplier portal rightly says client
+      if (app === 'portal' && /\bvisits?\b/i.test(t)) add('visit-job', t);
+    }
+    document.querySelectorAll('button, a, [data-component$="ButtonComponent"]').forEach(function (b) {
+      if (b.closest('[data-proto-ui]') || b.closest(NAV)) return; var t = b.textContent.replace(/\s+/g, ' ').trim();
+      if (/^(submit|ok|yes|no|click here)$/i.test(t)) add('button', t);
+    });
+    document.querySelectorAll('h1, h2, h3, h4, [data-component="Admin::HeadingComponent"]').forEach(function (h) {
+      if (h.closest('[data-proto-ui]') || hidden(h)) return; var t = h.textContent.replace(/\s+/g, ' ').trim(), words = t.split(' ').slice(1).filter(function (w) { return /^[A-Za-z]{4,}$/.test(w); });
+      if (words.length >= 2 && words.every(function (w) { return /^[A-Z]/.test(w); })) add('title-case', t);
+    });
+    return out;
+  }
+  function write(o) { var s = document.createElement('script'); s.type = 'application/json'; s.id = 'qa-results'; s.textContent = JSON.stringify(o).replace(/</g, '\\u003c'); document.body.appendChild(s); }
+  function run() {
+    var res = { copy: [], a11y: null };
+    try { res.copy = copy(); } catch (e) { res.copyError = String(e); }
+    if (!window.axe) { res.a11yError = 'axe-core did not load'; return write(res); }
+    window.axe.run({ exclude: [['[data-proto-ui]'], ['[data-component="Admin::PrimaryNav::Component"]'], ['[data-component="Vendor::Nav::Component"]']] }, {
+      runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'] },
+      rules: { 'html-has-lang': { enabled: false }, 'document-title': { enabled: false }, 'bypass': { enabled: false }, 'meta-viewport': { enabled: false } },
+      resultTypes: ['violations']
+    }).then(function (r) {
+      res.a11y = r.violations.map(function (v) { return { id: v.id, impact: v.impact, help: v.help, url: v.helpUrl, count: v.nodes.length, nodes: v.nodes.slice(0, 3).map(function (x) { return { target: x.target.join(' '), html: x.html.slice(0, 160) }; }) }; });
+      write(res);
+    }, function (e) { res.a11yError = String(e); write(res); });
+  }
+  window.addEventListener('load', function () { setTimeout(run, __DELAY__); });
+})();`.replace('__DELAY__', String(Math.max(1500, wait - 2500)));
+const qaFile = path.join(path.dirname(path.resolve(page)), `.drift-qa-${process.pid}.html`);
+let qaBase = base;
+if (QA) {
+  fs.writeFileSync(qaFile, fs.readFileSync(page, 'utf8') + `\n<script src="${AXE}"></script>\n<script>${QA_SCRIPT}</script>\n`);
+  qaBase = pathToFileURL(qaFile).href;
+  if (!flag('--keep-qa')) process.on('exit', () => { try { fs.unlinkSync(qaFile); } catch (e) {} });
+}
+const qaFlags = ['--headless=new', '--disable-gpu', '--hide-scrollbars', `--window-size=${width},900`, `--virtual-time-budget=${wait + 8000}`];
+const render = (hash) => QA ? execFileSync(chrome, [...qaFlags, '--dump-dom', qaBase + hash], { encoding: 'utf8', maxBuffer: 512 * 1024 * 1024, stdio: ['ignore', 'pipe', 'ignore'] }) : dump(base + hash);
+const qaOf = (html) => { const m = html.match(/<script[^>]*id="qa-results"[^>]*>([\s\S]*?)<\/script>/); try { return m ? JSON.parse(m[1]) : null; } catch (e) { return null; } }; // script text is never entity-encoded
+
 // ---------- run ----------
 console.log('Rendering the page as it loads…');
-const first = dump(base);
+const first = render('');
 let states = statesFrom(first);
 const runs = [{ id: null, label: 'As it loads', html: first }];
-if (states) for (const s of states) { process.stdout.write(`  ${s.id}\n`); runs.push({ id: s.id, label: s.label || s.id, marker: s.marker, html: dump(`${base}#state=${encodeURIComponent(s.id)}`) }); }
+if (states) for (const s of states) { process.stdout.write(`  ${s.id}\n`); runs.push({ id: s.id, label: s.label || s.id, marker: s.marker, html: render(`#state=${encodeURIComponent(s.id)}`) }); }
 else add('warning', 'states', 'No states list (script#proto-states), so only the page as it loads was checked', null);
 
 // The guide's stories: every state belongs to one, and every state a story names exists.
@@ -156,6 +239,42 @@ const src = fs.readFileSync(page, 'utf8').replace(/<script\b[\s\S]*?<\/script>/g
 const css = [...src.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/gi)].map((m) => m[1]).join('\n').replace(/\/\*[\s\S]*?\*\//g, '');
 for (const rule of css.match(/[^{}]+\{[^{}]*\}/g) || []) { const sel = rule.split('{')[0].trim(); if (!/ds-|proto-|@media|@keyframes/.test(sel)) st.cssRules.add(sel); }
 
+// Accessibility and copy findings, merged across states.
+const COPY_RULES = {
+  uppercase: 'Uppercase text. Never uppercase, not even small headings',
+  allcaps: 'A word in capitals. Never uppercase; acronyms are fine',
+  staffer: '"Staffer" capitalised mid-sentence. It\'s lowercase unless it starts a sentence',
+  member: '"member" in lowercase. Member always has a capital M',
+  helper: '"helper" in lowercase. Helper always has a capital H',
+  term: 'A term the writing guide says not to use (client, patient, carer, worker, staff member…)',
+  please: '"please" or "simply"',
+  spelling: 'US spelling. Use Australian English',
+  date: 'Month-first date. Write 10 Nov 2026',
+  'visit-job': '"job" in Admin, or "visit" in the supplier portal. Admin says visit; the supplier portal says job',
+  confirm: '"Are you sure". State the consequence instead',
+  button: 'A vague button label. Say what happens',
+  'title-case': 'A heading in title case. Use sentence case'
+};
+const a11y = new Map(), copyFound = new Map(), qaMissing = [];
+if (QA) for (const r of runs) {
+  const where = r.id || '(as it loads)', q = qaOf(r.html);
+  if (!q) { qaMissing.push(where); continue; }
+  if (q.a11yError) qaMissing.push(where + ' (' + q.a11yError + ')');
+  for (const v of q.a11y || []) {
+    const e = a11y.get(v.id) || { ...v, total: 0, states: [] };
+    e.total += v.count; e.states.push(where); a11y.set(v.id, e);
+  }
+  for (const c of q.copy || []) {
+    const k = c.rule + '|' + c.text, e = copyFound.get(k) || { ...c, states: [] };
+    e.states.push(where); copyFound.set(k, e);
+  }
+}
+const IMPACT = { critical: 0, serious: 1, moderate: 2, minor: 3 };
+const a11yList = [...a11y.values()].sort((a, b) => (IMPACT[a.impact] ?? 4) - (IMPACT[b.impact] ?? 4) || b.states.length - a.states.length);
+const copyList = [...copyFound.values()].sort((a, b) => Object.keys(COPY_RULES).indexOf(a.rule) - Object.keys(COPY_RULES).indexOf(b.rule));
+const statesTxt = (s) => s.length > 3 ? s.slice(0, 3).join(', ') + ` and ${s.length - 3} more` : s.join(', ');
+const cell = (s) => String(s).replace(/\|/g, '\\|').replace(/\n/g, ' ');
+
 // Merge identical issues across states.
 const merged = new Map();
 for (const i of issues) { const k = i.level + '|' + i.msg; if (!merged.has(k)) merged.set(k, { ...i, where: [] }); if (i.where && !merged.get(k).where.includes(i.where)) merged.get(k).where.push(i.where); }
@@ -167,6 +286,8 @@ const report = {
   states: runs.map((r) => ({ id: r.id, label: r.label, markers: r.count })),
   components: names, errors, warnings, info: list.filter((i) => i.level === 'info'),
   styling: { inlineStyles: [...st.inline], colours: [...st.hex], arbitraryValues: [...st.arbitrary], cssRules: [...st.cssRules] },
+  accessibility: QA ? { checker: 'axe-core 4.10.2, WCAG 2.2 AA rules', findings: a11yList, notChecked: qaMissing } : null,
+  copy: QA ? { findings: copyList } : null,
   passed: errors.length === 0 && (!flag('--strict') || warnings.length === 0)
 };
 fs.writeFileSync(path.join(out, 'drift-report.json'), JSON.stringify(report, null, 1));
@@ -189,11 +310,24 @@ const md = [
   `| Colours in markup | ${st.hex.size} | ${[...st.hex].slice(0, 5).map((s) => '`' + s + '`').join(', ')} |`,
   `| Arbitrary Tailwind values | ${st.arbitrary.size} | ${[...st.arbitrary].slice(0, 5).map((s) => '`' + s + '`').join(', ')} |`,
   `| CSS rules in \`<style>\` | ${st.cssRules.size} | ${[...st.cssRules].slice(0, 5).map((s) => '`' + s.slice(0, 40) + '`').join(', ')} |`, '',
+  ...(QA ? [
+    '## Accessibility', '',
+    'Reported, not failed. axe-core 4.10.2 with its WCAG 2.2 AA rules, on every state, leaving out the prototype bar, the app\'s own navigation and rules about the prototype file itself. Some findings come from the components themselves; they belong to the component, not the prototype. Automated checks find about a third of accessibility problems: keyboard use, focus order and screen reader sense still need a person.', '',
+    ...(a11yList.length ? ['| Rule | Impact | Elements | States | Example |', '|---|---|---|---|---|',
+      ...a11yList.map((v) => `| [${v.id}](${v.url}): ${cell(v.help)} | ${v.impact || ''} | ${v.total} | ${statesTxt(v.states)} | \`${cell(v.nodes[0] ? v.nodes[0].target : '')}\` |`)] : ['No findings.']),
+    ...(qaMissing.length ? ['', `Not checked in: ${statesTxt(qaMissing)}.`] : []), '',
+    '## Copy', '',
+    'Reported, not failed. Visible text, outside the app\'s own navigation, checked against the writing guide\'s confirmed rules and terminology. Each is a prompt to look, not a verdict: "member" may be right in "team member", and a quoted word may be fine.', '',
+    ...(copyList.length ? ['| Rule | Text | States |', '|---|---|---|',
+      ...copyList.map((c) => `| ${cell(COPY_RULES[c.rule] || c.rule)} | ${cell(c.text)} | ${statesTxt(c.states)} |`)] : ['No findings.']), ''
+  ] : []),
   '## Not checked', '',
   '- Components with no marker at all: the check reads markers, it can\'t see unmarked components.',
   '- Prop values (only prop names), and styling props a component passes through.',
   `- Widths other than ${width}px.`, ''
 ].join('\n');
 fs.writeFileSync(path.join(out, 'drift-report.md'), md);
-console.log(`${report.passed ? 'Passed' : 'Failed'}: ${errors.length} errors, ${warnings.length} warnings. Report: ${path.join(out, 'drift-report.md')}`);
+console.log(`${report.passed ? 'Passed' : 'Failed'}: ${errors.length} errors, ${warnings.length} warnings.` +
+  (QA ? ` Accessibility: ${a11yList.length} rules flagged${qaMissing.length ? `, ${qaMissing.length} states not checked` : ''}. Copy: ${copyList.length} to look at.` : '') +
+  ` Report: ${path.join(out, 'drift-report.md')}`);
 process.exit(report.passed ? 0 : 1);

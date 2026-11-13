@@ -315,6 +315,29 @@ It opens every state, checks every marker against Lookout's components, and
 writes `drift-check/drift-report.md` next to the page. Fix what it finds in
 the prototype, not in the check.
 
+The same run checks **accessibility and copy** in every state. Both are
+reported, never failed, and both leave out the prototype bar and the app's own
+navigation:
+- **Accessibility:** axe-core's WCAG 2.2 AA rules, loaded from a pinned CDN
+  address. It needs a network connection; `--no-qa` skips both checks.
+- **Copy:** visible text against `references/writing-guide.md`'s confirmed
+  rules and terminology: uppercase, "staffer", Member, Helper, terms not to
+  use, US spelling, month-first dates, "visit" in Admin and "job" in the
+  supplier portal, "Are you sure", vague button labels and title-case headings.
+
+Read both sections of the report with the designer, and sort each finding:
+- **The prototype's own:** a select or field with no label, a contrast
+  problem from the prototype's own styling, copy that breaks the guide. Fix it
+  in the prototype. Give a standalone select a label with `UI.select({ label })`.
+- **The component's:** a colour, uppercase or ARIA problem that comes from a
+  Lookout component itself. Don't restyle the component: note it as a finding
+  for the design system, and in the handover.
+- **Fine as it is:** a word the copy check can't judge, such as "team member",
+  quoted sample text, or "client" in a context the guide allows. Leave it.
+
+Automated checks find about a third of accessibility problems. Keyboard use,
+focus order and whether it makes sense to a screen reader still need a person.
+
 Mark slots the way the kit does: an instance's filled slots go in
 `data-slots='["left"]'` (`UI.dc`'s fifth argument), never in `data-props`.
 

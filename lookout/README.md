@@ -20,9 +20,12 @@ as its profile. Everyday prototyping, checking and handover need only
 ## Set up
 
 1. Clone this repo to `~/skills` (see the main README).
-2. Link the skills into your Claude Code skills folder:
+2. Link the skills into your Claude Code skills folder, from a free Terminal
+   tab and not from inside the Lookout repo:
 
    ```bash
+   cd ~
+   mkdir -p ~/.claude/skills
    ln -s ~/skills/lookout/lookout-prototype ~/.claude/skills/lookout-prototype
    ln -s ~/skills/product-design/vibe-killer ~/.claude/skills/vibe-killer
    ```
@@ -41,13 +44,9 @@ Claude Code: testing guide for designers".
 In testing with the design team, from 13 Nov 2026.
 
 **Known issues in the kit**, from vibe-killer's check of the supplier price
-lists prototype on 11 Nov:
+lists prototype on 11 Nov. The invalid props it found were fixed on 13 Nov.
 
-- `UI.input` sets a `status` prop that `FieldComponent` doesn't have.
-- `UI.dl` sets `item_variant`, which `DefinitionListComponent` doesn't have.
-- `UI.table` sets a `variant` prop that `Table::BuilderComponent` doesn't take.
-- `UI.checkbox` sets `checked` as a prop; it's an attribute.
-- Tabs and segments are buttons, and are missing their required `url:`.
-- 37 components' classes have drifted from Lookout's source, waiting for review.
+- Some components' classes have drifted from Lookout's source; being checked
+  against the source one by one.
 - The design system list, `lookout-prototype/catalog/ds-components.txt`, is
   kept in step with the Lookout Design System by hand.

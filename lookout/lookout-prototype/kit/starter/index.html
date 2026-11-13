@@ -115,8 +115,15 @@ var UI = (function () {
   // ---------- Form ----------
   function hint(html) { return '<div ' + dc('Admin::Form::HintComponent') + ' class="leading-snug text-pretty [&>p:first-child]:mt-0 [&>p:last-child]:mb-0 text-sm text-charcoal-700">' + html + '</div>'; }
   function error(html) { return '<div ' + dc('Admin::Form::ErrorComponent', null, 'code') + ' class="text-sm text-warning">' + html + '</div>'; }
+  // The label always points at its control, as Rails' form builder pairs them: given an id (o.for), or one made up
+  // here for the control's first input, select or textarea. Radio and checkbox groups are labelled by their options.
+  var fieldSeq = 0;
   function field(label, control, o) {
     o = o || {};
+    if (label && !o.for && !/type="(radio|checkbox)"/.test(control)) {
+      var m = control.match(/<(input|select|textarea)\b[^>]*>/);
+      if (m) { var idm = m[0].match(/\sid="([^"]+)"/); o.for = idm ? idm[1] : 'field-' + (++fieldSeq); if (!idm) control = control.replace(m[0], m[0].replace(/^<(input|select|textarea)/, '<$1 id="' + o.for + '"')); }
+    }
     return '<div ' + dc('Admin::Form::ControlComponent', { layout: 'vertical' }) + ' class="flex flex-col gap-2 w-full">' + (label ? '<label class="block font-medium"' + (o.for ? ' for="' + o.for + '"' : '') + '>' + label + (o.optional ? ' <span class="font-normal text-charcoal-700">Optional</span>' : '') + '</label>' : '') +
       '<div class="space-y-2 grow">' + control + (o.error ? error(o.error) : '') + (o.hint ? hint(o.hint) : '') + '</div></div>';
   }
@@ -127,6 +134,7 @@ var UI = (function () {
   // o: { type, bind, value, id, left, right, width ('w-max' | 'w-full' | 'w-[10rem]'), error, attrs, size: 8 }
   function input(o) {
     var props = {}, slots = []; if (o.left) slots.push('left'); if (o.right) slots.push('right');
+    if (o.error) props.variant = 'error'; if (o.type && o.type !== 'text') props.type = o.type;
     var h = o.size === 8 ? 'h-10' : 'h-11';
     var inp = '<input type="' + (o.type || 'text') + '" class="' + INNER + (o.left ? 'px-3' : 'px-4') + (o.alignRight ? ' text-right' : '') + '"' + (o.id ? ' id="' + o.id + '"' : '') + (o.bind ? ' data-b="' + o.bind + '"' : '') + ' value="' + esc(o.value == null ? '' : o.value) + '"' + (o.attrs || '') + '>';
     return '<div ' + dc('Admin::Form::Input::FieldComponent', props, null, null, slots) + ' class="' + BOX + (o.error ? BOX_ERR : BOX_OK) + ' ' + (o.width || 'w-max') + ' ' + h + '">' +
@@ -150,7 +158,7 @@ var UI = (function () {
   }
   function radios(inner) { return '<div ' + dc('Admin::Form::Input::RadioButtonCollectionComponent') + ' class="space-y-4">' + inner + '</div>'; }
   var CHECK_IN = "appearance-none rounded border border-solid shrink-0 bg-no-repeat bg-center bg-[length:60%] cursor-pointer bg-white border-manatee-diet checked:bg-royal checked:border-royal hover:border-royal outline-none focus:ring-opacity-20 focus:ring-4 focus:ring-royal focus:border-royal disabled:opacity-50 disabled:hover:border-manatee-diet disabled:cursor-not-allowed w-4 h-4";
-  function checkbox(on, o) { return '<input ' + dc('Admin::Form::Input::CheckboxComponent', on ? { checked: true } : null) + ' type="checkbox"' + (on ? ' checked' : '') + ' class="' + CHECK_IN + '" aria-label="' + esc(o && o.label || 'Select') + '">'; }
+  function checkbox(on, o) { return '<input ' + dc('Admin::Form::Input::CheckboxComponent') + ' type="checkbox"' + (on ? ' checked' : '') + ' class="' + CHECK_IN + '" aria-label="' + esc(o && o.label || 'Select') + '">'; }
   // A checkbox with its label: Admin::Form::CheckboxInsideLabelComponent
   function checkRow(on, label, sub, o) {
     var panelV = o && o.panel;
@@ -164,7 +172,7 @@ var UI = (function () {
 
   // ---------- Admin::DefinitionListComponent ----------
   function dl(pairs, inline) {
-    return '<dl ' + dc('Admin::DefinitionListComponent', inline ? { item_variant: 'inline' } : null) + ' class="m-0 grid grid-cols-1 @container/definition-list gap-4' + (inline ? ' divide-solid divide-x-0 divide-y divide-manatee-polar' : '') + '">' + pairs.map(function (p) {
+    return '<dl ' + dc('Admin::DefinitionListComponent', inline ? { variant: 'inline' } : { divided: false }) + ' class="m-0 grid grid-cols-1 @container/definition-list gap-4' + (inline ? ' divide-solid divide-x-0 divide-y divide-manatee-polar' : '') + '">' + pairs.map(function (p) {
       var item = dc('Admin::DefinitionListItemComponent', inline ? { variant: 'inline' } : null, 'code', null, ['title', 'body']);
       return inline ? '<div ' + item + ' class="flex flex-col gap-1 @md/definition-list:flex-row @md/definition-list:items-center @md/definition-list:justify-between pt-4 first:pt-0"><dt class="font-medium leading-snug">' + p[0] + '</dt><dd class="m-0 leading-snug @md/definition-list:text-right">' + p[1] + '</dd></div>'
         : '<div ' + item + ' class="flex flex-col gap-1 @md/definition-list:flex-row @md/definition-list:justify-between"><dt class="font-medium leading-snug @md/definition-list:basis-1/4 @md/definition-list:shrink-0">' + p[0] + '</dt><dd class="m-0 leading-snug @md/definition-list:basis-3/4">' + p[1] + '</dd></div>';
@@ -177,7 +185,7 @@ var UI = (function () {
   // cols: [label | {label, right}]; rows: array of tr strings. o: { border: true (default), cls }
   function table(cols, rows, o) {
     o = o || {}; var border = o.border !== false;
-    return '<div class="overflow-x-auto max-w-full"><div ' + dc('Admin::Table::BuilderComponent', border ? { variant: 'border' } : null) + ' class="min-w-min"><table class="min-w-full border-separate' + (border ? ' border border-solid border-grey-light rounded-lg shadow print:shadow-transparent print:border-0 bg-white' : '') + '" style="border-spacing:0"><thead class="top-0"><tr>' +
+    return '<div class="overflow-x-auto max-w-full"><div ' + dc('Admin::Table::BuilderComponent', border ? { table_variant: 'border' } : null) + ' class="min-w-min"><table class="min-w-full border-separate' + (border ? ' border border-solid border-grey-light rounded-lg shadow print:shadow-transparent print:border-0 bg-white' : '') + '" style="border-spacing:0"><thead class="top-0"><tr>' +
       cols.map(function (c) { c = typeof c === 'string' ? { label: c } : c; return '<th ' + dc('Admin::Table::HeaderComponent', null, 'code') + ' class="' + TH + (c.right ? 'text-right' : 'text-left') + '">' + c.label + '</th>'; }).join('') + '</tr></thead><tbody>' + rows.join('') + '</tbody></table></div></div>';
   }
   function td(html, o) { o = o || {}; return '<td ' + dc('Admin::Table::DataComponent', null, 'code') + ' class="' + TD + (o.right ? 'text-right' : 'text-left') + (o.dim ? ' text-charcoal-700' : '') + (o.cls ? ' ' + o.cls : '') + '"' + (o.colspan ? ' colspan="' + o.colspan + '"' : '') + '>' + html + '</td>'; }
@@ -264,7 +272,7 @@ var T2 = (function () {
   function tabs(items, active, action) {
     return '<div ' + dc('Admin::TabbedHeaderComponent', null, 'code') + ' class="flex-row flex space-x-6 flex-nowrap overflow-x-auto">' + items.map(function (t) {
       var on = t[0] === active, label = t[2] != null ? '<div class="flex items-center gap-2"><div>' + t[1] + '</div>' + count(t[2], t[3] && t[2] > 0) + '</div>' : t[1];
-      return '<button type="button" ' + dc('Admin::TabComponent', { active: on }, 'code') + ' data-active="' + on + '" class="' + TAB + '"' + (action ? ' data-a="' + action + '" data-v="' + t[0] + '"' : ' tabindex="-1"') + '>' + label + '</button>';
+      return '<a href="javascript:void(0)" ' + dc('Admin::TabComponent', { url: '#', active: on }, 'code') + ' data-active="' + on + '" class="' + TAB + '"' + (action ? ' data-a="' + action + '" data-v="' + t[0] + '"' : '') + (on ? ' aria-current="page"' : '') + '>' + label + '</a>';
     }).join('') + '</div>';
   }
   // In-page view switches. Pass 1 uses TabComponent, as Admin::Rates::TabbedHeaderComponent does for Active / Archived.
@@ -374,7 +382,7 @@ var ICONS = {
     return '<nav ' + dc('Admin::SegmentControlsComponent', null, 'code') + ' class="bg-grey-lighter border-grey-light border rounded-md border-solid flex-row flex w-fit max-w-full overflow-x-auto">' + items.map(function (t) {
       var on = t[0] === active, warn = (t[0] === 'error' || t[0] === 'need') && t[2] > 0;
       var label = t[2] != null ? '<div class="flex items-center justify-center gap-2"><div>' + t[1] + '</div>' + T2.count(t[2], warn) + '</div>' : t[1];
-      return '<button type="button" ' + dc('Admin::SegmentComponent', { active: on }, 'code') + ' data-a="' + action + '" data-v="' + t[0] + '" class="font-medium text-center hover:no-underline min-w-32 h-10 px-5 flex-auto text-sm px-3 py-2 border rounded-md border-solid whitespace-nowrap cursor-pointer ' + (on ? 'bg-white border-grey-light text-royal hover:text-charcoal' : 'bg-transparent border-transparent text-charcoal hover:text-royal') + '">' + label + '</button>';
+      return '<a href="javascript:void(0)" ' + dc('Admin::SegmentComponent', { url: '#', active: on }, 'code') + ' data-a="' + action + '" data-v="' + t[0] + '"' + (on ? ' aria-current="page"' : '') + ' class="font-medium text-center hover:no-underline min-w-32 h-10 px-5 flex-auto text-sm px-3 py-2 border rounded-md border-solid whitespace-nowrap cursor-pointer ' + (on ? 'bg-white border-grey-light text-royal hover:text-charcoal' : 'bg-transparent border-transparent text-charcoal hover:text-royal') + '">' + label + '</a>';
     }).join('') + '</nav>';
   };
 })();
@@ -1189,6 +1197,8 @@ var Proto = (function () {
   var MENU = 'details[data-component="Admin::MultiActionMenuComponent"]';
   document.addEventListener('toggle', function (e) {
     var d = e.target; if (!d.matches || !d.matches(MENU)) return;
+    // A menu a state draws open (data-menu-static) stays where it's drawn.
+    if (d.hasAttribute('data-menu-static')) return;
     var pop = d.querySelector('[data-menu-pop]'); if (!d.open) { pop.classList.add('invisible'); return; }
     document.querySelectorAll(MENU + '[open]').forEach(function (o) { if (o !== d) o.open = false; });
     var r = d.querySelector('summary').getBoundingClientRect(); pop.style.top = (r.bottom + 6) + 'px'; pop.style.left = Math.max(8, r.right - pop.offsetWidth) + 'px'; pop.classList.remove('invisible');

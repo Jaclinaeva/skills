@@ -59,8 +59,15 @@ var UI = (function () {
   // ---------- Form ----------
   function hint(html) { return '<div ' + dc('Admin::Form::HintComponent') + ' class="leading-snug text-pretty [&>p:first-child]:mt-0 [&>p:last-child]:mb-0 text-sm text-charcoal-700">' + html + '</div>'; }
   function error(html) { return '<div ' + dc('Admin::Form::ErrorComponent', null, 'code') + ' class="text-sm text-warning">' + html + '</div>'; }
+  // The label always points at its control, as Rails' form builder pairs them: given an id (o.for), or one made up
+  // here for the control's first input, select or textarea. Radio and checkbox groups are labelled by their options.
+  var fieldSeq = 0;
   function field(label, control, o) {
     o = o || {};
+    if (label && !o.for && !/type="(radio|checkbox)"/.test(control)) {
+      var m = control.match(/<(input|select|textarea)\b[^>]*>/);
+      if (m) { var idm = m[0].match(/\sid="([^"]+)"/); o.for = idm ? idm[1] : 'field-' + (++fieldSeq); if (!idm) control = control.replace(m[0], m[0].replace(/^<(input|select|textarea)/, '<$1 id="' + o.for + '"')); }
+    }
     return '<div ' + dc('Admin::Form::ControlComponent', { layout: 'vertical' }) + ' class="flex flex-col gap-2 w-full">' + (label ? '<label class="block font-medium"' + (o.for ? ' for="' + o.for + '"' : '') + '>' + label + (o.optional ? ' <span class="font-normal text-charcoal-700">Optional</span>' : '') + '</label>' : '') +
       '<div class="space-y-2 grow">' + control + (o.error ? error(o.error) : '') + (o.hint ? hint(o.hint) : '') + '</div></div>';
   }
@@ -71,6 +78,7 @@ var UI = (function () {
   // o: { type, bind, value, id, left, right, width ('w-max' | 'w-full' | 'w-[10rem]'), error, attrs, size: 8 }
   function input(o) {
     var props = {}, slots = []; if (o.left) slots.push('left'); if (o.right) slots.push('right');
+    if (o.error) props.variant = 'error'; if (o.type && o.type !== 'text') props.type = o.type;
     var h = o.size === 8 ? 'h-10' : 'h-11';
     var inp = '<input type="' + (o.type || 'text') + '" class="' + INNER + (o.left ? 'px-3' : 'px-4') + (o.alignRight ? ' text-right' : '') + '"' + (o.id ? ' id="' + o.id + '"' : '') + (o.bind ? ' data-b="' + o.bind + '"' : '') + ' value="' + esc(o.value == null ? '' : o.value) + '"' + (o.attrs || '') + '>';
     return '<div ' + dc('Admin::Form::Input::FieldComponent', props, null, null, slots) + ' class="' + BOX + (o.error ? BOX_ERR : BOX_OK) + ' ' + (o.width || 'w-max') + ' ' + h + '">' +
@@ -81,7 +89,7 @@ var UI = (function () {
   var CHEVRON = '<div class="shrink-0 w-4 h-4 align-middle inline-block"><svg width="100%" height="100%" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" class="block"><path d="M16 8L10 14L4 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>';
   // options: [[value, label]]
   function select(o) {
-    return '<div ' + dc('Admin::Form::Input::SelectComponent') + ' class="' + BOX + BOX_OK + ' cursor-pointer outline-none relative text-sm font-medium items-center relative cursor-pointer leading-4 ' + (o.width || 'w-max') + ' ' + (o.size === 8 ? 'h-10' : 'h-11') + '"><div class="flex-1 border-0 min-w-0 p-0 p-0 rounded-lg"><select' + (o.id ? ' id="' + o.id + '"' : '') + (o.bind ? ' data-b="' + o.bind + '"' : '') + ' class="appearance-none bg-transparent border-none w-full border-box pl-4 pr-14 py-3 h-full cursor-pointer outline-none">' +
+    return '<div ' + dc('Admin::Form::Input::SelectComponent') + ' class="' + BOX + BOX_OK + ' cursor-pointer outline-none relative text-sm font-medium items-center relative cursor-pointer leading-4 ' + (o.width || 'w-max') + ' ' + (o.size === 8 ? 'h-10' : 'h-11') + '"><div class="flex-1 border-0 min-w-0 p-0 p-0 rounded-lg"><select' + (o.id ? ' id="' + o.id + '"' : '') + (o.label ? ' aria-label="' + esc(o.label) + '"' : '') + (o.bind ? ' data-b="' + o.bind + '"' : '') + ' class="appearance-none bg-transparent border-none w-full border-box pl-4 pr-14 py-3 h-full cursor-pointer outline-none">' +
       o.options.map(function (x) { return '<option value="' + esc(x[0]) + '"' + (String(x[0]) === String(o.value) ? ' selected' : '') + '>' + esc(x[1]) + '</option>'; }).join('') +
       '</select></div><div class="flex-0 border-0 flex items-center rounded-r-lg h-full w-10 justify-center border-0 border-l border-solid absolute right-0 bottom-0 top-0 pointer-events-none">' + CHEVRON + '</div></div>';
   }
@@ -94,7 +102,7 @@ var UI = (function () {
   }
   function radios(inner) { return '<div ' + dc('Admin::Form::Input::RadioButtonCollectionComponent') + ' class="space-y-4">' + inner + '</div>'; }
   var CHECK_IN = "appearance-none rounded border border-solid shrink-0 bg-no-repeat bg-center bg-[length:60%] cursor-pointer bg-white border-manatee-diet checked:bg-royal checked:border-royal hover:border-royal outline-none focus:ring-opacity-20 focus:ring-4 focus:ring-royal focus:border-royal disabled:opacity-50 disabled:hover:border-manatee-diet disabled:cursor-not-allowed w-4 h-4";
-  function checkbox(on, o) { return '<input ' + dc('Admin::Form::Input::CheckboxComponent', on ? { checked: true } : null) + ' type="checkbox"' + (on ? ' checked' : '') + ' class="' + CHECK_IN + '" aria-label="' + esc(o && o.label || 'Select') + '">'; }
+  function checkbox(on, o) { return '<input ' + dc('Admin::Form::Input::CheckboxComponent') + ' type="checkbox"' + (on ? ' checked' : '') + ' class="' + CHECK_IN + '" aria-label="' + esc(o && o.label || 'Select') + '">'; }
   // A checkbox with its label: Admin::Form::CheckboxInsideLabelComponent
   function checkRow(on, label, sub, o) {
     var panelV = o && o.panel;
@@ -108,7 +116,7 @@ var UI = (function () {
 
   // ---------- Admin::DefinitionListComponent ----------
   function dl(pairs, inline) {
-    return '<dl ' + dc('Admin::DefinitionListComponent', inline ? { item_variant: 'inline' } : null) + ' class="m-0 grid grid-cols-1 @container/definition-list gap-4' + (inline ? ' divide-solid divide-x-0 divide-y divide-manatee-polar' : '') + '">' + pairs.map(function (p) {
+    return '<dl ' + dc('Admin::DefinitionListComponent', inline ? { variant: 'inline' } : { divided: false }) + ' class="m-0 grid grid-cols-1 @container/definition-list gap-4' + (inline ? ' divide-solid divide-x-0 divide-y divide-manatee-polar' : '') + '">' + pairs.map(function (p) {
       var item = dc('Admin::DefinitionListItemComponent', inline ? { variant: 'inline' } : null, 'code', null, ['title', 'body']);
       return inline ? '<div ' + item + ' class="flex flex-col gap-1 @md/definition-list:flex-row @md/definition-list:items-center @md/definition-list:justify-between pt-4 first:pt-0"><dt class="font-medium leading-snug">' + p[0] + '</dt><dd class="m-0 leading-snug @md/definition-list:text-right">' + p[1] + '</dd></div>'
         : '<div ' + item + ' class="flex flex-col gap-1 @md/definition-list:flex-row @md/definition-list:justify-between"><dt class="font-medium leading-snug @md/definition-list:basis-1/4 @md/definition-list:shrink-0">' + p[0] + '</dt><dd class="m-0 leading-snug @md/definition-list:basis-3/4">' + p[1] + '</dd></div>';
@@ -121,7 +129,7 @@ var UI = (function () {
   // cols: [label | {label, right}]; rows: array of tr strings. o: { border: true (default), cls }
   function table(cols, rows, o) {
     o = o || {}; var border = o.border !== false;
-    return '<div class="overflow-x-auto max-w-full"><div ' + dc('Admin::Table::BuilderComponent', border ? { variant: 'border' } : null) + ' class="min-w-min"><table class="min-w-full border-separate' + (border ? ' border border-solid border-grey-light rounded-lg shadow print:shadow-transparent print:border-0 bg-white' : '') + '" style="border-spacing:0"><thead class="top-0"><tr>' +
+    return '<div class="overflow-x-auto max-w-full"><div ' + dc('Admin::Table::BuilderComponent', border ? { table_variant: 'border' } : null) + ' class="min-w-min"><table class="min-w-full border-separate' + (border ? ' border border-solid border-grey-light rounded-lg shadow print:shadow-transparent print:border-0 bg-white' : '') + '" style="border-spacing:0"><thead class="top-0"><tr>' +
       cols.map(function (c) { c = typeof c === 'string' ? { label: c } : c; return '<th ' + dc('Admin::Table::HeaderComponent', null, 'code') + ' class="' + TH + (c.right ? 'text-right' : 'text-left') + '">' + c.label + '</th>'; }).join('') + '</tr></thead><tbody>' + rows.join('') + '</tbody></table></div></div>';
   }
   function td(html, o) { o = o || {}; return '<td ' + dc('Admin::Table::DataComponent', null, 'code') + ' class="' + TD + (o.right ? 'text-right' : 'text-left') + (o.dim ? ' text-charcoal-700' : '') + (o.cls ? ' ' + o.cls : '') + '"' + (o.colspan ? ' colspan="' + o.colspan + '"' : '') + '>' + html + '</td>'; }
