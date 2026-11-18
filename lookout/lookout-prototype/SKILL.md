@@ -28,7 +28,12 @@ first, then carry on from step 2.
 ## Start a prototype
 
 1. Ask where the prototype lives if the designer hasn't said. Default: a
-   `prototypes/<slug>/` folder in the current directory.
+   `prototypes/<slug>/` folder in the current directory, usually
+   `~/lookout/prototypes/`. In the Lookout repo, check that
+   `git check-ignore -q prototypes/x` succeeds before writing anything. If it
+   doesn't, stop and ask the designer to add `/prototypes/` to
+   `.git/info/exclude`, so prototypes are never committed. Never add it to
+   `.gitignore`, and never touch the app's own files.
 2. **Ask: design system or wireframe?** The design system is for working
    out the real thing. A wireframe is for conveying an idea quickly, without
    getting every detail right (see Wireframes).

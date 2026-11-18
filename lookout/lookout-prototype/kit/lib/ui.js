@@ -49,7 +49,7 @@ var UI = (function () {
   }
 
   // ---------- Admin::CalloutComponent ----------
-  var CALLOUT = { alert: 'border-l-butterscotch bg-butterscotch-100', ok: 'border-l-emerald bg-emerald-100', warning: 'border-l-warning bg-warning-100', info: 'border-l-charcoal bg-snowflake' };
+  var CALLOUT = { alert: 'border-l-butterscotch bg-butterscotch-100', ok: 'border-l-emerald bg-emerald-100', warning: 'border-l-warning bg-warning-100', info: 'border-l-charcoal bg-snowflake', royal: 'border-l-royal bg-royal-50', aqua: 'border-l-aqua bg-snowflake', cornflower: 'border-l-cornflower bg-snowflake' };
   function callout(inner, variant) { variant = variant || 'info'; return '<div ' + dc('Admin::CalloutComponent', { variant: variant }) + ' class="rounded-md border-0 border-solid border-l-4 text-md leading-normal ' + CALLOUT[variant] + ' px-6 py-4 flex flex-col gap-2">' + inner + '</div>'; }
 
   // ---------- Admin::HeadingComponent ----------

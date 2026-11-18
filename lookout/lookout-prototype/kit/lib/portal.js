@@ -29,7 +29,8 @@ var VP = (function () {
     return '<a ' + dc('Vendor::Nav::ItemComponent', props, 'code') + ' href="javascript:void(0)" class="group/nav-item flex items-center gap-3 px-6 py-3 text-base leading-tight lg:py-2.5 lg:text-sm no-underline hover:no-underline focus:no-underline ' + LABEL[st] + '"' + (o.a ? ' data-a="' + o.a + '"' : '') + (o.active ? ' aria-current="page"' : '') + '>' +
       icon(ic, 5, ICON_ST[st]) + '<span class="flex-1 truncate">' + label + '</span>' + (o.count ? countPill(o.count) : '') + '</a>';
   }
-  function subItem(label) { return '<a href="javascript:void(0)" class="flex items-center pl-14 pr-6 py-3 text-base leading-tight lg:py-2 lg:text-sm lg:leading-tight no-underline hover:no-underline focus:no-underline ' + LABEL.def + '">' + label + '</a>'; }
+  // A Jobs sub-item (Scheduled, Completed), as Vendor::Nav::Component#sub_item_classes: the item label styles, active or default.
+  function subItem(label, o) { o = o || {}; return '<a href="javascript:void(0)" class="flex items-center pl-14 pr-6 py-3 text-base leading-tight lg:py-2 lg:text-sm lg:leading-tight no-underline hover:no-underline focus:no-underline ' + LABEL[o.active ? 'active' : 'def'] + '"' + (o.a ? ' data-a="' + o.a + '"' + (o.v != null ? ' data-v="' + o.v + '"' : '') : '') + (o.active ? ' aria-current="page"' : '') + '>' + label + '</a>'; }
   function nav(active, o) {
     o = o || {}; var on = function (l) { return active === l; }, acts = o.navActions || {};
     // o.navActions: { "Services": ["tab", "services"] } makes a nav item run a prototype action. o.messages: the unread count.
@@ -38,7 +39,7 @@ var VP = (function () {
       '<div class="hidden sm:flex justify-center px-5 pt-2 pb-4 lg:pt-6 shrink-0"><a href="javascript:void(0)" aria-label="Supplier portal home" class="block no-underline hover:no-underline rounded-lg"><span class="flex flex-col items-center gap-2.5">' + img('logo_mark', 'block h-9 w-9 shrink-0') + '<span class="text-lg font-semibold leading-tight text-charcoal">Supplier portal</span></span></a></div>' +
       '<div class="flex-1 min-h-0 overflow-y-auto pt-2 lg:pb-2 mt-1"><div class="space-y-1">' +
       navItem('Service requests', 'question_stroke', Object.assign({ active: on('Service requests') }, go('Service requests'))) +
-      navItem('Jobs', 'calendar_time_stroke', { section: true, active: on('Jobs') }) + '<div class="space-y-1">' + subItem('Scheduled') + subItem('Completed') + '</div>' +
+      navItem('Jobs', 'calendar_time_stroke', { section: true, active: on('Jobs') || on('Scheduled') || on('Completed') }) + '<div class="space-y-1">' + subItem('Scheduled', Object.assign({ active: on('Scheduled') }, go('Scheduled'))) + subItem('Completed', Object.assign({ active: on('Completed') }, go('Completed'))) + '</div>' +
       navItem('Messages', 'chat', Object.assign({ count: o.messages, active: on('Messages') }, go('Messages'))) +
       navItem('Your team', 'group_team', Object.assign({ active: on('Your team') }, go('Your team'))) +
       navItem('Service areas', 'map_stroke', Object.assign({ active: on('Service areas') }, go('Service areas'))) +

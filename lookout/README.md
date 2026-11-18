@@ -20,20 +20,28 @@ as its profile. Everyday prototyping, checking and handover need only
 ## Set up
 
 1. Clone this repo to `~/skills` (see the main README).
-2. Link the skills into your Claude Code skills folder, from a free Terminal
-   tab and not from inside the Lookout repo:
+2. Link the skills into your Claude Code skills folder:
 
    ```bash
-   cd ~
    mkdir -p ~/.claude/skills
    ln -s ~/skills/lookout/lookout-prototype ~/.claude/skills/lookout-prototype
    ln -s ~/skills/product-design/vibe-killer ~/.claude/skills/vibe-killer
    ```
 
-3. Start Claude Code in your own prototypes folder, never inside the Lookout
-   repo, and type `/lookout-prototype` or ask for a Lookout prototype.
+3. Give prototypes a folder in your Lookout checkout that git ignores, using
+   the checkout's local exclude list. Nothing in the repo changes, and
+   `git add .` can't commit the folder:
 
-The checks borrow Node from your Lookout checkout at `~/lookout`. The full
+   ```bash
+   mkdir -p ~/lookout/prototypes
+   grep -qx '/prototypes/' ~/lookout/.git/info/exclude || echo '/prototypes/' >> ~/lookout/.git/info/exclude
+   ```
+
+4. Start Claude Code in `~/lookout` (`cd ~/lookout && claude`) and type
+   `/lookout-prototype` or ask for a Lookout prototype.
+
+The checks and figma-console use Node from the Lookout setup, so they work
+from there with no extra setup. The full
 testing guide, including the Figma setup, is in Notion: "Prototyping with
 Claude Code: testing guide for designers".
 

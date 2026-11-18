@@ -87,6 +87,8 @@ const H = { setText, relabelButton, text: (n) => texts(n).join(' ').replace(/\s+
 function libEntry(name, page, mirrors) { return LIB.find((c) => c.name === name && (!page || c.page === page)) || LIB.find((c) => c.name === name && c.mirrors === mirrors) || LIB.find((c) => c.name === name); }
 async function iconComp(name) { if (!name) return null; const tries = [name, name.replace(/_(stroke|solid)$/, ''), name.replace(/_stroke$/, '_solid'), name.replace(/_solid$/, '_stroke')]; for (const t of tries) { const key = ICONS[t] || (MAP.icons || {})[t]; if (key) return await comp(key); } return null; }
 
+function inSlot(p) { for (; p; p = p.parent) if (p.type === 'SLOT') return true; return false; }
+
 // Returns { inst, slot, slotKids } for a marked component with a library match, or null to draw it.
 async function libraryInstance(n) {
   let props = {}; try { props = JSON.parse(n.props || '{}'); } catch (e) {}
@@ -158,7 +160,9 @@ async function build(n, parent, src) {
   // src: where this layer came from in the capture (child indexes from the screen), for reading changes back.
   const tag = (x) => { x.setSharedPluginData('lookout', 'src', src); return x; };
   if (n.component || (n.input && /^(checkbox|radio)$/.test(n.input.type))) {
-    const ti = Date.now(); const got = await libraryInstance(n); tick('instance', ti);
+    const ti = Date.now(); let got = await libraryInstance(n); tick('instance', ti);
+    // Figma cannot fill a slot of an instance that sits inside another instance's slot, so draw those instead.
+    if (got && got.slot && inSlot(parent)) { got.inst.remove(); got = null; }
     if (got) {
       const inst = got.inst; report.instances++; if (n.component) { mark(inst, n); report.marked++; report.used.add(n.component); }
       parent.appendChild(inst); tag(inst);

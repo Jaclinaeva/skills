@@ -50,12 +50,14 @@ var CODE_MATCHED = (function () {
       use: 'Checkbox row', page: 'Forms (code-matched)', variants: { Checked: (p, n, h) => String(!!h.input(n).checked) },
       text: { Label: (p, n, h) => h.firstText(n), Description: (p, n, h) => h.texts(n).slice(1).join(' ') }, bools: { 'Show description': (p, n, h) => h.texts(n).length > 1 }
     },
-    'Admin::Form::Input::RadioButton::OptionComponent': { use: 'Radio option', page: 'Forms (code-matched)', variants: { Selected: (p, n, h) => String(!!h.input(n).checked) }, text: { Label: (p, n, h) => h.text(n) } },
+    'Admin::Form::Input::RadioButton::OptionComponent': { use: 'Radio option', page: 'Forms (code-matched)', variants: { Selected: (p, n, h) => String(!!h.input(n).checked) }, text: { Label: (p, n, h) => h.texts(n)[0] || '' },
+      // The component has a fixed supporting text line: give it the hint, or hide it.
+      after: async (i, p, n, h) => { const hint = h.texts(n).slice(1).join(' '); const t = i.findAll((x) => x.type === 'TEXT').filter((x) => x.characters !== (h.texts(n)[0] || '')); for (const x of t) { if (hint) await h.setText(x, hint); else x.visible = false; } } },
     'Admin::CalloutComponent': { use: 'Callout', variants: { Type: v('variant', 'info') }, text: { Message: (p, n, h) => h.text(n) }, when: (p, n, h) => simple(n, h) },
     'FlashComponent': { use: 'Toast', variants: { Type: v('type', 'notice') }, text: { Message: (p, n, h) => h.text(n) } },
     'Admin::PanelComponent': { use: 'Panel', page: 'Panels (code-matched)', variants: { Variant: v('variant', 'default'), Size: v('size', '16') }, text: { Content: (p, n, h) => h.text(n) }, when: (p, n, h) => simple(n, h) },
     'Admin::MetricComponent': { use: 'Metric', variants: { Variant: v('variant', 'manatee') }, text: { Label: (p, n, h) => h.texts(n)[0] || '', Amount: (p, n, h) => h.texts(n)[1] || '' }, bools: { 'Show percentage': () => false } },
-    'Admin::DefinitionListItemComponent': { use: 'Definition list item', variants: { Variant: v('variant', 'default') }, text: { Title: (p, n, h) => h.texts(n)[0] || '', Body: (p, n, h) => h.texts(n).slice(1).join(' ') }, when: (p, n, h) => simple(n, h) },
+    'Admin::DefinitionListItemComponent': { use: 'Definition list item', variants: { Variant: (p, n) => { const d = p.variant || 'default', k = n.children || []; return d === 'default' && k.length === 2 && k[1].x >= k[0].x + k[0].w - 1 ? 'inline_left' : d; } }, text: { Title: (p, n, h) => h.texts(n)[0] || '', Body: (p, n, h) => h.texts(n).slice(1).join(' ') }, when: (p, n, h) => simple(n, h) },
     'Admin::Popover::ItemComponent': { use: 'Popover item', variants: { Variant: (p) => (p.variant === 'destructive' ? 'destructive' : 'default') }, text: { Label: (p, n, h) => h.text(n) }, bools: { 'Show icon': (p, n, h) => !!h.icon(n) } },
     'Admin::Table::HeaderComponent': { use: 'Table heading', variants: { Padding: (p, n) => String(Math.round((n.pad ? n.pad[0] : 12) / 4)) }, text: { Text: (p, n, h) => h.text(n) }, when: (p, n, h) => simple(n, h) },
     'Admin::Table::DataComponent': {

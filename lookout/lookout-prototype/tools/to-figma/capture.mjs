@@ -29,11 +29,14 @@ const chrome = findChrome();
 // Runs in the page: serialises #app (and fixed overlays such as modals) into a tree Figma can rebuild.
 const CAPTURE = String.raw`
 (function () {
+  // Headless Chrome does not run CSS transitions, so a state that redraws would be read mid-transition.
+  var noAnim = document.createElement('style'); noAnim.textContent = '*, *::before, *::after { transition: none !important; animation: none !important; }'; document.head.appendChild(noAnim);
   function px(v) { return parseFloat(v) || 0; }
   function rgba(c) { var m = c && c.match(/rgba?\(([^)]+)\)/); if (!m) return null; var p = m[1].split(/[ ,\/]+/).filter(Boolean).map(Number); var a = p.length > 3 ? p[3] : 1; if (a === 0) return null; return { r: p[0] / 255, g: p[1] / 255, b: p[2] / 255, a: a }; }
   // Screen-reader-only text (Tailwind's sr-only): in the page for assistive tech, never on screen.
   function srOnly(el, cs) { cs = cs || getComputedStyle(el); var r = el.getBoundingClientRect(); return (cs.position === 'absolute' && r.width <= 1 && r.height <= 1) || /rect\(0(px)?,? 0(px)?,? 0(px)?,? 0(px)?\)/.test(cs.clip) || cs.clipPath === 'inset(50%)'; }
-  function visible(el, cs) { if (cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity === 0 || srOnly(el, cs)) return false; var r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0; }
+  function inClosedDetails(el) { var d = el.parentElement && el.parentElement.closest('details:not([open])'); return !!d && !(el.closest('summary') && el.closest('summary').parentElement === d); }
+  function visible(el, cs) { if (inClosedDetails(el) || cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity === 0 || srOnly(el, cs)) return false; var r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0; }
   function inlineOnly(el) { for (var c = el.firstElementChild; c; c = c.nextElementSibling) { var d = getComputedStyle(c).display; if (!/^inline/.test(d) || c.tagName === 'svg' || c.tagName === 'IMG' || c.hasAttribute('data-component') || /^(INPUT|SELECT|TEXTAREA|BUTTON)$/.test(c.tagName)) return false; } return true; }
   function textOf(el) { var out = ''; (function walk(x) { for (var c = x.firstChild; c; c = c.nextSibling) { if (c.nodeType === 3) out += c.textContent; else if (c.nodeType === 1 && !srOnly(c) && getComputedStyle(c).display !== 'none') { if (c.tagName === 'BR') out += ' '; else walk(c); } } })(el); return out.replace(/\s+/g, ' ').trim(); }
   function font(cs) { return { size: px(cs.fontSize), weight: +cs.fontWeight || 400, lineHeight: cs.lineHeight === 'normal' ? null : px(cs.lineHeight), letterSpacing: cs.letterSpacing === 'normal' ? 0 : px(cs.letterSpacing), color: rgba(cs.color), align: cs.textAlign, transform: cs.textTransform, italic: cs.fontStyle === 'italic', underline: /underline/.test(cs.textDecorationLine) }; }

@@ -16,6 +16,7 @@
 //       id: 'U8', title: 'Know how to start',       // as in the stories doc
 //       story: 'As a new supplier, I want …',        // optional: the story itself
 //       url: 'https://…',                            // optional: a link to it
+//       area: 'Purchase orders',                     // optional: groups stories; the guide gets a switch, one area at a time
 //       steps: [{ state, title, text, detail }],     // the main path; detail: HTML, or a function returning it
 //       other: [{ state, how, detail }],             // other paths; how: how a user gets there
 //       notDesigned: [{ label, reason }]             // considered and deliberately not built
@@ -35,7 +36,7 @@
 //   Toolbar.update()         call after the page redraws
 var Toolbar = (function () {
   var cfg = { scope: '#app', inDs: [], states: [], stories: [], storiesSource: null, guide: [], guideIntro: '', notDesigned: [], go: null };
-  var current = null, guidePos = null, openStory = null;
+  var current = null, guidePos = null, openStory = null, pickedArea = null;
   var KEY = 'ds-legend-v1', on = false, open = null, hidden = false, tiers = { ds: false, code: true, proposed: true };
   try { var saved = JSON.parse(localStorage.getItem(KEY) || 'null'); if (saved) { on = saved.on; tiers = saved.tiers; hidden = !!saved.hidden; } } catch (e) {}
   try { var g0 = JSON.parse(sessionStorage.getItem(KEY + '-guide') || 'null'); if (g0) { guidePos = g0.pos || null; openStory = g0.story == null ? null : g0.story; open = g0.open === 'states' ? 'guide' : g0.open; } } catch (e) {}
@@ -105,6 +106,11 @@ var Toolbar = (function () {
     '#ds-legend .ds-detail { padding: 4px 12px 12px; background: #E5EBFD; color: #333570; font-size: 13px; line-height: 1.5; }',
     '#ds-legend .ds-detail ul { margin: 0; padding-left: 18px; list-style: disc; color: inherit; font-size: inherit; gap: 4px; }',
     '#ds-legend .ds-detail b { font-weight: 500; }',
+    '#ds-legend .ds-areas { display: flex; gap: 2px; padding: 2px; margin: 2px 0 4px; background: #EFF0F7; border-radius: 8px; }',
+    '#ds-legend .ds-area { appearance: none; border: 0; background: none; font: inherit; font-size: 12px; font-weight: 500; color: #52549A; flex: 1; padding: 6px 4px; border-radius: 6px; cursor: pointer; white-space: nowrap; }',
+    '#ds-legend .ds-area:hover { color: #162250; }',
+    '#ds-legend .ds-area[aria-pressed="true"] { background: #fff; color: #162250; box-shadow: 0 1px 2px rgba(51,53,112,.15); }',
+    '#ds-legend .ds-area:focus-visible { outline: 2px solid #0034E5; outline-offset: 1px; }',
     '#ds-legend .ds-sec { display: flex; flex-direction: column; gap: 6px; }',
     '#ds-legend .ds-sec + .ds-sec { border-top: 1px solid #DEDEE7; padding-top: 6px; }',
     '#ds-legend .ds-story { appearance: none; border: 0; background: none; font: inherit; color: #162250; text-align: left; padding: 6px; margin: 0 -6px; border-radius: 4px; cursor: pointer; display: flex; align-items: baseline; gap: 8px; }',
@@ -176,10 +182,17 @@ var Toolbar = (function () {
   }
   function detailOf(g) { return g.detail ? '<div class="ds-detail">' + (typeof g.detail === 'function' ? g.detail() : g.detail) + '</div>' : ''; }
   function isCur(key, state) { return guidePos != null ? guidePos === key && state === current : state === current; }
+  // Areas (optional): stories with an `area` get a switch at the top of the guide that shows one area at a time.
+  // The area follows the open story until someone picks one; sections with no area show in every area.
+  function areasOf(secs) { var a = []; secs.forEach(function (s) { if (s.area && a.indexOf(s.area) < 0) a.push(s.area); }); return a; }
+  function activeArea(secs) { var areas = areasOf(secs); if (!areas.length) return null; if (pickedArea && areas.indexOf(pickedArea) >= 0) return pickedArea; var os = openSection(secs); return (secs[os] && secs[os].area) || areas[0]; }
   function guidePanel() {
     var secs = sections(), flat = flatSteps(secs), os = openSection(secs), single = secs.length === 1 && !secs[0].title;
+    var areas = areasOf(secs), area = activeArea(secs);
+    var areaBar = areas.length > 1 ? '<div class="ds-areas" role="group" aria-label="Areas">' + areas.map(function (a) { return '<button type="button" class="ds-area" data-t="area" data-v="' + esc(a) + '" aria-pressed="' + (a === area) + '">' + esc(a) + '</button>'; }).join('') + '</div>' : '';
     var src = cfg.storiesSource ? '<p class="ds-intro">Stories from ' + (cfg.storiesSource.url ? '<a href="' + esc(cfg.storiesSource.url) + '" target="_blank" rel="noopener">' + esc(cfg.storiesSource.title || 'the stories doc') + '</a>' : esc(cfg.storiesSource.title)) + '.</p>' : '';
     var html = secs.map(function (sec, si) {
+      if (area && sec.area && sec.area !== area) return '';
       var steps = sec.steps || [], other = sec.other || [], nd = sec.notDesigned || [], isOpen = single || si === os;
       var counts = [steps.length ? steps.length + (steps.length === 1 ? ' step' : ' steps') : '', other.length ? other.length + ' other' : '', nd.length ? nd.length + ' not designed' : ''].filter(Boolean).join(' · ');
       var head = single ? '' : '<button type="button" class="ds-story" data-t="story" data-s="' + si + '" aria-expanded="' + isOpen + '"><span class="ds-story-id">' + esc(sec.id || '') + '</span><span class="ds-story-t">' + esc(sec.title) + '</span><span class="ds-story-n">' + counts + '</span></button>';
@@ -198,7 +211,7 @@ var Toolbar = (function () {
     }).join('');
     var fi = flat.indexOf(guidePos);
     var nav = fi >= 0 ? '<div class="ds-step-nav"><button type="button" class="ds-link" data-t="go" data-p="' + (flat[fi - 1] || '') + '"' + (fi === 0 ? ' disabled' : '') + '>Back</button><span>Step ' + (fi + 1) + ' of ' + flat.length + '</span><button type="button" class="ds-link" data-t="go" data-p="' + (flat[fi + 1] || '') + '"' + (fi === flat.length - 1 ? ' disabled' : '') + '>Next</button></div>' : '';
-    return '<div class="ds-panel ds-guide"><b>Guide</b>' + (cfg.guideIntro ? '<p class="ds-intro">' + esc(cfg.guideIntro) + '</p>' : '') + src + html + nav + '<p>Each state opens from a fresh start. Its link: #state=&lt;id&gt;.</p></div>';
+    return '<div class="ds-panel ds-guide"><b>Guide</b>' + (cfg.guideIntro ? '<p class="ds-intro">' + esc(cfg.guideIntro) + '</p>' : '') + src + areaBar + html + nav + '<p>Each state opens from a fresh start. Its link: #state=&lt;id&gt;.</p></div>';
   }
   function hasGuide() { return !!(cfg.stories.length || cfg.guide.length || cfg.states.length); }
   function update() {
@@ -223,8 +236,14 @@ var Toolbar = (function () {
   document.addEventListener('click', function (e) {
     var t = e.target.closest('#ds-legend [data-t]'); if (!t) return;
     var k = t.getAttribute('data-t');
-    if (k === 'go') { var p = t.getAttribute('data-p'), g = p && posItem(sections(), p); if (!g) return; guidePos = p; openStory = +p.split(':')[0]; save(); cfg.go(g.state); return; }
+    if (k === 'go') { var p = t.getAttribute('data-p'), g = p && posItem(sections(), p); if (!g) return; guidePos = p; openStory = +p.split(':')[0]; pickedArea = null; save(); cfg.go(g.state); return; }
+    if (k === 'area') {
+      var secs0 = sections(); pickedArea = t.getAttribute('data-v');
+      var first = secs0.map(function (s, i) { return s.area === pickedArea ? i : -1; }).filter(function (i) { return i >= 0; })[0];
+      if (secs0[openSection(secs0)].area !== pickedArea) openStory = first;
+    }
     if (k === 'story') { var si = +t.getAttribute('data-s'); openStory = openSection(sections()) === si ? -1 : si; }
+    else if (k === 'area') { /* handled above */ }
     else if (k === 'guide') open = open === k ? null : k;
     else if (k === 'toggle') { on = !on; open = on ? 'components' : (open === 'components' ? null : open); }
     else if (k === 'hide') { hidden = !hidden; open = null; }
