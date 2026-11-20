@@ -44,6 +44,12 @@ Every region gets exactly one:
 account for looks like an accident, and a Keep with no rationale is just
 bespoke CSS wearing a badge.
 
+**Delete is for chrome, never for components.** A component from phase 1's
+inventory can't be deleted on your judgement: ask the human, and record
+their answer. Where the kit or library lacks a component or a slot the
+original uses (a tag's icon, a sidebar), add it from the system's source;
+don't drop it.
+
 ---
 
 ## Verify before you write it down

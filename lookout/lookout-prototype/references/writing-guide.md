@@ -1,7 +1,5 @@
 # Writing guide
 
-> Adapted from Leila's lookout-design-system skill, with Lookout's confirmed rules added below.
-
 > **DRAFT.** These are starting defaults based on Lookout's context. Replace or extend them with Lookout's official writing and style guide, and remove anything that conflicts with it.
 
 ## Voice

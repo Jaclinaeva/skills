@@ -1,7 +1,5 @@
 # Accessibility
 
-> Adapted from Leila's lookout-design-system skill.
-
 **Target:** WCAG 2.2 Level AA (it includes all of 2.1 AA). Lookout's official target.
 
 Build to these rules from the start; the review pass checks them again.

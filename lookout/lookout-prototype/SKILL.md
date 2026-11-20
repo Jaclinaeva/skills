@@ -1,6 +1,6 @@
 ---
 name: lookout-prototype
-description: Build a Lookout admin prototype from the Lookout Design System kit, with every component marked, so it can go to Figma, gain its states and hand over to engineering without drifting from the system. Also builds quick greyscale wireframes on the same runtime. Use when a designer starts a new Lookout prototype or wireframe, adds a screen or state to one, or asks how prototypes are built here.
+description: Build a Lookout admin prototype from the Lookout Design System kit, with every component marked, so it can go to Figma, gain its states and hand over to engineering without drifting from the system. Also builds Care app prototypes, shown in a phone with state toggles beside it, and quick greyscale wireframes, all on the same runtime. Use when a designer starts a new Lookout prototype or wireframe, including one for the Care app, a Member or Helper screen or anything on mobile, adds a screen or state to one, or asks how prototypes are built here.
 ---
 
 # Lookout prototype
@@ -34,16 +34,21 @@ first, then carry on from step 2.
    doesn't, stop and ask the designer to add `/prototypes/` to
    `.git/info/exclude`, so prototypes are never committed. Never add it to
    `.gitignore`, and never touch the app's own files.
-2. **Ask: design system or wireframe?** The design system is for working
-   out the real thing. A wireframe is for conveying an idea quickly, without
-   getting every detail right (see Wireframes).
+2. **Ask which template:**
+   - **Design system:** an admin or supplier portal screen, for working out
+     the real thing.
+   - **Care:** a screen in the Care app, the one Members and Helpers use,
+     shown in a phone with its toggles and notes beside it (see Care
+     prototypes).
+   - **Wireframe:** for conveying an idea quickly, without getting every
+     detail right (see Wireframes).
 3. **Ask whether there are user stories** to follow, usually a Notion page.
    They're optional. If there are, read them and copy the ones the
    prototype covers into `stories`, in the doc's order, with their IDs and
    wording, and the guide follows them (see The prototype bar). If not, use
    a plain `guide`; stories can be added later.
-4. Copy `kit/starter/` there, or `kit/wireframe-starter/` for a wireframe.
-   Its `app.js` is a working page to replace.
+4. Copy the template's starter there: `kit/starter/`, `kit/care-starter/`
+   or `kit/wireframe-starter/`. Its `app.js` is a working page to replace.
 5. Build it with `<this skill>/kit/build.sh <folder> "<Page title>"`. That
    writes `<folder>/index.html`, one standalone page.
 6. Open it, then show the designer.
@@ -84,6 +89,18 @@ design system prototypes, not wireframes.
 | Messages | `WF.callout(text, { tone, title, actions })`, `WF.empty(title, text, action)`, `WF.toast` |
 | Forms | `WF.field(label, { type, value, hint, error, bind, optional })`, `WF.choices(label, items)` |
 | Not worked out | `WF.box(label, { h })` |
+
+## Care prototypes
+
+A Care prototype is for the Care app, the one Members and Helpers use. It
+runs in a phone, with toggles and notes beside it, and is built from Care's
+own components (`CARE`) and stylesheet, never the admin's `UI` or `T2`.
+`template: 'care'` in `Proto.start` is what makes it one. States, stories,
+the guide and the drift check work as they do for any prototype.
+
+**Read `references/care-prototypes.md` before building or changing one.** It
+covers the side panel's toggles and notes, the phone, the Care components
+the kit has, the rules that differ, and how to refresh Care's stylesheet.
 
 ## Suggest the other states
 
@@ -457,6 +474,8 @@ Someone with the Lookout repo does this when components change:
 ## Files
 
 - `references/writing-guide.md`: Lookout's writing rules and copy patterns
+- `references/care-prototypes.md`: Care prototypes: the phone, the side
+  panel, Care's components and rules
 - `references/accessibility.md`: accessibility rules for Admin and Care
 - `references/sample-data.md`: sample data, Australian formats and scale
 - `references/handover.md`, `templates/handover.md`: the handover step and
@@ -474,5 +493,10 @@ Someone with the Lookout repo does this when components change:
   `icons.js`), the supplier portal's pieces (`portal.js`, `portal-icons.js`),
   the wireframe blocks (`wf.js`), sample data (`sample.js`), the prototype
   runtime (`proto.js`) and the prototype bar (`toolbar.js`)
-- `kit/starter/`, `kit/wireframe-starter/`: the pages to copy
+- `kit/lib/care.js`, `kit/lib/care-assets.js`, `kit/lib/care-shell.js`: Care's
+  components, their images, and the phone and side panel
+- `kit/care/`: the Care page (`head.html`), Care's stylesheet (`care.css`)
+  and the phone and side panel styles (`chrome.css`)
+- `kit/starter/`, `kit/care-starter/`, `kit/wireframe-starter/`: the pages to
+  copy
 - `kit/build.sh`: builds a prototype folder into one page

@@ -32,6 +32,14 @@ or a screenshot instead of guessing at what's probably there.
 Record the source and its fidelity at the top of the autopsy. Every number
 downstream inherits it.
 
+**Render it and look before you read the code.** Open the original in every
+state you're converting, at desktop width, and screenshot each one into
+`kills/<date>-<slug>/original/shots/`. The regions and the component
+inventory below come from those screenshots first, then the code. Code
+reading alone misses whatever another part of the page draws: a sidebar, a
+stats bar, the table the new feature sits on. If the page can't be rendered,
+say so here, and every region you list is `[from code only]`.
+
 ---
 
 ## Name the source type
@@ -42,11 +50,12 @@ much of this phase applies:
 | Type | Example | Tells and before-counts |
 |---|---|---|
 | **Vibe-coded page** | An AI-generated landing page | Run both in full |
-| **Styled prototype** | A designer's clickable prototype in near-final styling | Counts only; skip the tells |
+| **Styled prototype** | A designer's clickable prototype in near-final styling | Counts only; skip the tells. Count only CSS the prototype defines: production class strings are components |
 | **Wireframe** | A deliberate greyscale prototype | Skip both. One line: "Wireframe: bespoke CSS is intentional scaffolding" |
 
-Record the type at the top of the autopsy. For prototypes and wireframes,
-the regions and the states below are the whole value of this phase.
+Record the type at the top of the autopsy. Every type gets the render and
+the component inventory. For prototypes and wireframes, those, the regions
+and the states are the whole value of this phase.
 
 ---
 
@@ -139,6 +148,28 @@ Some judgment calls that come up every time:
 
 ---
 
+## Inventory the components
+
+Walk each screenshot and list every component you can see, one row per
+component per screen. This is the list phase 4 checks the conversion
+against, so it has to be complete, not representative.
+
+| # | Screen / state | What you see | Component | How you know | Count |
+|---|---|---|---|---|---|
+| 1 | Logs | Kind of actor beside a name, in every row | `Admin::TagComponent` | class string matches `tag_component.rb` | 20 |
+| 2 | Logs | Collapsible filter groups on the left | `Admin::Sidebar::FilterGroupComponent` | code comment names it | 9 |
+
+- **Marked or not.** A styled prototype often copies production markup
+  without `data-component`. Identify it from the class string, a code
+  comment, or the catalog's source. Unmarked production markup is a
+  component to keep, never bespoke CSS to count against the original.
+- **Inside tables and lists too.** Tags in cells, icons beside text, row
+  actions: list them, with a count.
+- **When you can't name it,** write what it does and "unidentified". Phase 2
+  resolves it.
+
+---
+
 ## Catalog the states
 
 List every distinct state the page shows, wherever it uses a visual
@@ -178,7 +209,8 @@ Note them, don't touch them. Rewriting the words is a different job.
 One line to the user, with real numbers:
 
 > Forensics done: 14 of 30 tells, 47 hardcoded colors, 31 bespoke classes,
-> 9 regions, 0 focus styles, 4 unverifiable claims. Mapping next.
+> 9 regions, 0 focus styles, 4 unverifiable claims, 23 components
+> inventoried across 3 screens. Mapping next.
 
 Then ask the posture question from `SKILL.md` if you haven't yet, and record
 the answer at the top of the autopsy.

@@ -11,6 +11,7 @@
 //       belongs to a story. storiesSource: { title, url } names the stories doc. See toolbar.js for every field.
 //     guide: [{ state, title, text }]   for a page with no stories yet: one main path.
 //     render(state) returns the page's HTML, usually Proto.shell(Proto.page(header, body)).
+//     template: 'care' makes it a Care prototype: a phone with toggles and notes beside it. See care-shell.js.
 //     A click on [data-a="name"] calls actions.name(value, state), value from data-v, then re-renders.
 //     An input with data-b="path.to.key" writes its value into state at that path.
 var Proto = (function () {
@@ -26,8 +27,14 @@ var Proto = (function () {
   function page(head, body) { return head + '<div class="px-6 py-6 flex flex-col gap-6 min-w-0">' + body + '</div>'; }
 
   // ---------- render loop ----------
-  function draw() {
+  // In a Care prototype the phone's screen scrolls on its own. A redraw keeps its place while the same screen is
+  // showing (the id given to Proto.phone), and starts at the top when the screen changes or reset is true.
+  function draw(reset) {
+    var was = document.querySelector('#app .screen'), id = was && was.getAttribute('data-screen'), top = was ? was.scrollTop : 0;
     document.getElementById('app').innerHTML = app.render(app.state);
+    var now = document.querySelector('#app .screen');
+    if (now && top && reset !== true && now.getAttribute('data-screen') === id) now.scrollTop = top;
+    if (app.care) CareShell.update(app.state);
     Toolbar.update();
   }
   function setPath(obj, path, value) {
@@ -73,7 +80,7 @@ var Proto = (function () {
   function goState(id) {
     var st = stateById(id); if (!st) return;
     var s = fresh(); if (st.set) st.set(s);
-    app.state = s; Toolbar.setCurrent(id); draw();
+    app.state = s; Toolbar.setCurrent(id); draw(true);
     try { history.replaceState(null, '', '#state=' + encodeURIComponent(id)); } catch (e) {}
     Toolbar.flash(id);
   }
@@ -84,9 +91,17 @@ var Proto = (function () {
     app.actions = o.actions || {}; app.render = o.render; app.states = o.states || [];
     app.actions.toastHide = app.actions.toastHide || function () { document.getElementById('toast').hidden = true; };
     if (o.nav) NAV.config(o.nav);
+    // template: 'care' runs the prototype in a phone, with toggles and notes beside it (care-shell.js).
+    app.care = o.template === 'care';
+    if (app.care) CareShell.init(o, {
+      state: function () { return app.state; },
+      redraw: function (reset) { Toolbar.setCurrent(null); draw(reset); },
+      restart: function () { app.state = fresh(); Toolbar.setCurrent(null); try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {} draw(true); },
+      act: function (name) { var fn = app.actions[name]; if (!fn) { console.warn('No action named', name); return; } fn(null, app.state); Toolbar.setCurrent(null); draw(); }
+    });
     // The toolbar: Guide and Show components. Kit states must render their own id as data-state.
     Toolbar.init({
-      scope: '#app, body > .fixed',
+      scope: app.care ? '#app' : '#app, body > .fixed',
       // What's in the design system, from catalog/ds-components.txt (build.sh fills this in).
       inDs: [/*DS_COMPONENTS*/],
       states: app.states.map(function (x) { return { id: x.id, label: x.label, kind: x.kind, marker: x.id }; }),
@@ -97,5 +112,7 @@ var Proto = (function () {
     var id = stateFromHash();
     if (id && stateById(id)) goState(id); else draw();
   }
-  return { start: start, shell: shell, page: page, draw: draw, goState: goState };
+  // The phone's content in a Care prototype: Proto.phone(top, screen, { id, bar }). See care-shell.js.
+  function phone(top, screen, o) { return CareShell.phone(top, screen, o); }
+  return { start: start, shell: shell, page: page, phone: phone, draw: draw, goState: goState };
 })();

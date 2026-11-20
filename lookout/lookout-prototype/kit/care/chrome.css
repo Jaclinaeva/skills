@@ -1,0 +1,51 @@
+/* Prototype chrome for Care prototypes: the stage, the phone frame, the device status bar, the native app's
+   navigation bar and the side panel. None of it is part of the Care app. Everything in the design is in #app. */
+:root { color-scheme: light; --charcoal: #333570; --c70: #70729b; --border: #dedee7; --royal: #0034e5; --magenta: #b50575; --page: #e9eaf2; }
+html, body { margin: 0; padding: 0; background: var(--page); }
+body { font-family: 'Visuelt Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: var(--charcoal); -webkit-font-smoothing: antialiased; }
+[hidden] { display: none !important; }
+
+.stage { min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; gap: 40px; padding: 32px 24px; box-sizing: border-box; }
+/* transform makes the phone the containing block for Care's fixed flash and modals */
+.phone { width: 390px; height: 844px; background: #fff; border-radius: 44px; box-shadow: 0 0 0 10px #1c1d3a, 0 24px 60px rgba(22, 34, 80, .35); overflow: hidden; display: flex; flex-direction: column; position: relative; flex: none; transform: translateZ(0); }
+.phone-status { height: 44px; background: #333570; color: #fff; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 26px 6px; font-size: 14px; font-weight: 500; flex: none; box-sizing: border-box; }
+#app { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.native-bar { display: flex; align-items: center; gap: 8px; padding: 10px 8px 8px; border-bottom: 1px solid var(--border); background: #fff; flex: none; min-height: 55px; box-sizing: border-box; }
+.native-back { width: 36px; height: 36px; border: none; background: none; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--charcoal); cursor: pointer; padding: 0; }
+.native-back svg { width: 20px; height: 20px; }
+.native-title { flex: 1; margin: 0; font-size: 16px; font-weight: 500; text-align: center; padding-right: 44px; color: var(--charcoal); }
+.native-bar.no-back .native-title { padding-left: 44px; }
+.screen { flex: 1; min-height: 0; overflow-y: auto; position: relative; background: #fff; display: block; }
+
+.notes { width: 340px; flex: none; position: sticky; top: 32px; font-size: 15px; line-height: 1.4; }
+.notes h1 { font-size: 20px; font-weight: 500; margin: 0 0 4px; }
+.notes .lede { color: var(--c70); margin: 0 0 20px; font-size: 14px; }
+.notes :focus-visible { outline: 2px solid var(--royal); outline-offset: 2px; }
+.scen { display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; }
+.scen .scen-label { font-size: 13px; font-weight: 500; color: var(--c70); }
+.seg { display: flex; background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 3px; }
+.seg button { flex: 1; border: none; background: none; border-radius: 8px; padding: 8px 4px; font-size: 12.5px; white-space: nowrap; font-family: inherit; color: inherit; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--charcoal); color: #fff; }
+.seg.seg-wrap { flex-wrap: wrap; }
+.seg.seg-wrap button { flex: 1 1 45%; white-space: normal; }
+.note-card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; }
+.note-card .step { font-size: 13px; font-weight: 500; color: var(--magenta); margin-bottom: 4px; }
+.note-card h2 { font-size: 16px; font-weight: 500; margin: 0 0 8px; }
+.note-card ul { margin: 0; padding-left: 18px; font-size: 14px; }
+.note-card li { margin: 6px 0; }
+.note-card p { margin: 0; font-size: 14px; }
+.restart { margin-top: 14px; border: none; background: none; color: var(--royal); padding: 0; font-size: 14px; font-family: inherit; cursor: pointer; }
+/* The prototype bar pads the page and moves every .sticky.top-0 and full-screen overlay below itself. Inside the
+   phone those sit in the phone's own box, so keep them where Care puts them. */
+body.proto-bar-on .phone .sticky.top-0, body.proto-bar-on .phone .fixed.top-0, body.proto-bar-on .phone .fixed.inset-0, body.proto-bar-on .phone .fixed.inset-y-0 { top: 0 !important; }
+body.proto-bar-on .notes { top: calc(var(--proto-bar-h) + 32px); }
+@media (max-width: 820px) {
+  .stage { flex-direction: column; align-items: center; gap: 28px; padding: 24px 16px; }
+  .notes { position: static; width: min(390px, 100%); order: -1; }
+}
+@media (max-width: 480px) {
+  .stage { padding: 0; display: block; }
+  .phone { width: 100%; height: calc(100vh - var(--proto-bar-h, 0px)); border-radius: 0; box-shadow: none; }
+  .notes { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }

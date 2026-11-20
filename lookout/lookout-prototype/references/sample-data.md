@@ -1,7 +1,5 @@
 # Sample data
 
-> The Australian formats and awkward cases are adapted from Leila's lookout-design-system skill.
-
 Prototype data should look like a real provider's, so reviewers react to the
 design, not to "Test Member 1".
 

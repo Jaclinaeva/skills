@@ -124,6 +124,10 @@ async function libraryInstance(n) {
     let box = n; while (box.children && box.children.length === 1 && box.children[0].children) box = box.children[0];
     const title = modalTitle(n);
     kids = (box.children || []).filter((k) => k.component !== 'Admin::Modal::Component::Footer' && !find(k, (x) => x.component === 'Admin::Modal::Component::Footer') && !(title && find(k, (x) => x.text === title) && texts(k).length <= 2));
+    // A title bar with more than the component's header can hold (a title plus two or more actions, as side panels have)
+    // stays in the body as the prototype drew it, and the component's own header is hidden so the title isn't shown twice.
+    const bar = title && (box.children || []).find((k) => find(k, (x) => x.text === title) && texts(k).length > 2 && find(k, (x) => x.component === 'Admin::ButtonComponent'));
+    if (bar) { const hd = i.findOne((x) => x.name === 'Header'); if (hd) { hd.visible = false; report.misses.add(name + ' header hidden: the title bar has actions it has no place for'); } }
     if (kids.length === 1 && kids[0].children && !kids[0].component) kids = kids[0].children;
     await modalFooter(i, find(n, (x) => x.component === 'Admin::Modal::Component::Footer'));
   }
@@ -149,7 +153,7 @@ function textIn(n) { if (n.text) return n.text; return (n.children || []).map(te
 
 function stacked(kids) { const inFlow = kids.filter((k) => !k.pos); for (let i = 1; i < inFlow.length; i++) if (inFlow[i].y < inFlow[i - 1].y + inFlow[i - 1].h - 1) return false; return true; }
 function rowLike(kids) { const inFlow = kids.filter((k) => !k.pos); for (let i = 1; i < inFlow.length; i++) if (inFlow[i].x < inFlow[i - 1].x + inFlow[i - 1].w - 1) return false; return inFlow.length > 1; }
-const JUSTIFY = { 'flex-start': 'MIN', start: 'MIN', normal: 'MIN', center: 'CENTER', 'flex-end': 'MAX', end: 'MAX', 'space-between': 'SPACE_BETWEEN' };
+const JUSTIFY = { 'flex-start': 'MIN', start: 'MIN', normal: 'MIN', center: 'CENTER', 'flex-end': 'MAX', end: 'MAX', 'flow-end': 'MAX', right: 'MAX', 'space-between': 'SPACE_BETWEEN' };
 const ALIGN = { center: 'CENTER', 'flex-end': 'MAX', end: 'MAX', baseline: 'BASELINE' };
 
 // Builds a node and appends it to parent. The caller places it once the parent's layout is set, so each
@@ -182,7 +186,7 @@ async function build(n, parent, src) {
   if ((n.text && !n.children) || n.tag === '#text') {
     if (!n.bg && !n.border && !n.component && !(n.pad || []).some(Boolean)) { f = await makeText(n); parent.appendChild(f); return tag(f); }
   }
-  f = figma.createFrame(); f.name = shortName(n); f.clipsContent = false; paint(f, n); tag(f);
+  f = figma.createFrame(); f.name = shortName(n); f.clipsContent = !!n.clip; paint(f, n); tag(f);
   if (n.component) { mark(f, n); report.marked++; if (n.tier !== 'proposed') report.drawn.add(n.component); else report.proposed.add(n.component); }
   if (n.state) f.setSharedPluginData('lookout', 'state', n.state);
   parent.appendChild(f);
@@ -253,7 +257,7 @@ async function buildState(base, index, s, section, at) {
   const pos = old ? { x: old.x, y: old.y } : at;
   if (old) old.remove();
   const screen = figma.createFrame(); screen.name = index.prototype + ' / ' + s.id + (s.label ? ' · ' + s.label : '');
-  section.appendChild(screen); screen.resize(index.width, index.height); screen.clipsContent = true; screen.fills = solid(data.bg);
+  section.appendChild(screen); screen.resize(index.width, Math.round(data.h) || index.height); screen.clipsContent = true; screen.fills = solid(data.bg);
   screen.setSharedPluginData('lookout', 'prototype', index.prototype); screen.setSharedPluginData('lookout', 'state', s.id);
   if (s.kind) screen.setSharedPluginData('lookout', 'kind', s.kind);
   section.setSharedPluginData('lookout', 'building', s.id);
@@ -292,6 +296,10 @@ async function buildAll(base, opts) {
     const at = { x: 80 + col * (index.width + GAP), y: 80 + row * (index.height + GAP) };
     results.push(await buildState(base, index, s, section, at));
   }
+  // Rows follow the tallest frame in each, so a tall page never runs into the row below.
+  const mine = section.children.filter((c) => c.type === 'FRAME' && c.getSharedPluginData('lookout', 'prototype') === index.prototype);
+  let rowY = 200;
+  for (const r of regions) { const rowFrames = mine.filter((c) => { const st = index.states.find((x) => x.id === c.getSharedPluginData('lookout', 'state')); return st && st.region === r; }); if (!rowFrames.length) continue; rowFrames.forEach((c) => { c.y = rowY; }); rowY += Math.max(...rowFrames.map((c) => c.height)) + GAP + 80; }
   const kids = section.children; const maxX = kids.reduce((m, c) => Math.max(m, c.x + c.width), 0), maxY = kids.reduce((m, c) => Math.max(m, c.y + c.height), 0);
   section.resizeWithoutConstraints(maxX + 80, maxY + 80);
   section.setSharedPluginData('lookout', 'building', '');

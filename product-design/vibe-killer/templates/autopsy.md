@@ -37,6 +37,15 @@ HTML | rendered DOM | screenshot>
 
 ---
 
+## Component inventory (from the render)
+
+Screenshots: `./original/shots/`
+
+| # | Screen / state | What you see | Component | How you know | Count |
+|---|---|---|---|---|---|
+
+---
+
 ## Regions
 
 | # | Region | What it's for | Content it carries | Notes |

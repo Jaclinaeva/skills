@@ -77,7 +77,12 @@ inherits nothing and asks you to maintain it forever.
    the receipt rather than implying it works. A region you never *looked at*
    is a claim too. A clean validator and a DOM check that says every slot
    filled can both pass on a page a person would reject in seconds.
-8. **No shame, ever.** Somebody made a thing, and making things is good. The
+8. **Nothing in view is removed without the human saying so.** Every
+   component the original shows on screen, marked or not, ends up in the
+   conversion or on the receipt's Removed list with the human's approval.
+   Phase 1 lists them from a render; phase 4 checks the list. A styled
+   prototype's production class strings are components, not bespoke CSS.
+9. **No shame, ever.** Somebody made a thing, and making things is good. The
    original page is not stupid and neither is the person who prompted it.
    The receipt reports counts and facts, never snark.
 
@@ -125,8 +130,11 @@ Run the four phases in order. Give a one-line status between each.
    it's still current. If there isn't one, run `intake/SYSTEM-INTAKE.md`
    first. It takes a few minutes and everything afterward is faster and more
    accurate.
-2. **Ask the posture question** below. Don't skip it and don't guess.
-3. **Phase 1 — Forensics** (`phases/phase-1-forensics.md`). Read the source,
+2. **Ask the posture question** below. Don't skip it and don't guess. If
+   the page is bigger than the job, ask the scope question too, after
+   rendering the original.
+3. **Phase 1 — Forensics** (`phases/phase-1-forensics.md`). Render the
+   original, inventory every component on screen, then read the source,
    catalog the tells, and write down what each region is *for*.
 4. **Phase 2 — Mapping** (`phases/phase-2-mapping.md`). Every region gets a
    real component, a real composition, or an honest gap.
@@ -142,13 +150,15 @@ been converted before. Same four phases, lighter:
 - **Profile:** reuse `SYSTEM.md` without re-checking it, unless something
   fails.
 - **Posture:** reuse the last run's posture; don't ask again.
-- **Phase 1:** regions and states only. No tells, no before-counts.
+- **Phase 1:** render the screens this run touches, then list their
+  regions, states and component inventory. No tells, no before-counts.
 - **Phase 2:** use only components already in the profile. Anything else is
   a gap; don't read new component source to fill it.
 - **Phase 3:** unchanged, markers included.
-- **Phase 4:** the counts, the marker check, and one render at desktop
-  width of the default state. Skip the other widths and states, and the
-  human review step, and say so in the receipt.
+- **Phase 4:** the counts, the marker check, the removal check for the
+  screens touched, and one render at desktop width of the default state.
+  Skip the other widths and states, and the human review step, and say so
+  in the receipt.
 - **Receipt:** the short form in `phases/phase-4-proof.md`.
 
 Quick mode never skips the ground rules. It's the same honesty with less
@@ -196,6 +206,24 @@ longer, because a bespoke visual choice with no equivalent in the system
 becomes either a gap or an override, and overrides are the thing this whole
 skill exists to delete. Record the posture at the top of the autopsy so a
 later reader knows why the page looks how it looks.
+
+## The scope question (when the page is bigger than the job)
+
+Scope chooses which screens and states get converted. It never chooses how
+much of a screen survives. Every option you offer follows these rules:
+
+- **A screen in scope is converted in full.** Everything on it keeps its
+  components. Never offer a "simple version" of a screen.
+- **A screen out of scope is left out, not stood in for.** If the flow
+  needs it as a backdrop, keep the original's markup for it unchanged,
+  wrapped in one marker that says "not converted".
+- **An option that removes anything says so in its label**, naming what
+  goes.
+- **Recommend for a design reason, never for effort.** If an option is
+  only cheaper, offer it without "Recommended" and say it's cheaper.
+
+Before asking, render the original and list what's on each screen, so the
+options describe what's really there.
 
 ## Where the converted page goes
 

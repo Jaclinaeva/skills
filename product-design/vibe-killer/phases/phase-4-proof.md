@@ -118,6 +118,22 @@ in the receipt.
 
 ---
 
+### The removal check
+
+Compare phase 1's component inventory with the converted page, screen by
+screen. For each row, record one of:
+
+- **Kept:** the same component, or its system equivalent, at the same count
+- **Changed:** a different component, with the reason from phase 2
+- **Removed:** gone, with the human's approval and when they gave it
+
+A removal without approval is a bug in the conversion, not a result. Put
+it back before you write the receipt. A count that dropped (20 tags in the
+original, 0 in the conversion) is a removal, even when the component
+appears elsewhere.
+
+---
+
 ## 4. Check accessibility
 
 Walk the list, because these are the wins the original almost certainly
@@ -167,6 +183,8 @@ Fill in `templates/receipt.md`. It has to carry, at minimum:
 - **The posture** that was chosen, and one line on what it meant
 - **The evidence position**: how many mappings were `[verified]`
 - **Components used**, with counts
+- **The removal check**: every inventoried component kept, changed, or
+  removed with approval
 - **What's still bespoke**, every gap and every placeholder, named
 - **Accessibility fixed**, itemized
 - **Content flagged**, the unverifiable claims list, carried forward
@@ -199,9 +217,11 @@ In quick mode, write `receipt.md` with only these sections:
 
 1. **Changes:** what was converted or changed this run, in a short list.
 2. **Components used:** names and counts.
-3. **States:** n of n kept distinct, and any lost distinction.
-4. **Gaps:** new ones only, each in one line.
-5. **Not checked:** the widths, states and reviews quick mode skipped.
+3. **Removal check:** for the screens touched, ending "Removed without
+   approval: none". If it doesn't, the receipt isn't finished.
+4. **States:** n of n kept distinct, and any lost distinction.
+5. **Gaps:** new ones only, each in one line.
+6. **Not checked:** the widths, states and reviews quick mode skipped.
 
 No before/after table, no course lessons. Keep it to one screen.
 
@@ -209,12 +229,14 @@ No before/after table, no course lessons. Keep it to one screen.
 
 ## The honesty floor
 
-Four things this phase must never do, because each of them makes every
+Five things this phase must never do, because each of them makes every
 future receipt worthless:
 
 - **Report a count you estimated as if you measured it.** Say "estimated
   from a screenshot" when that's what happened.
 - **Claim the page renders when you never rendered it.**
+- **Count removed components as reduced bespoke CSS.** A headline that
+  shrinks because things were deleted is a false headline.
 - **Report zero bespoke CSS when a gap got quietly hand-rolled.** If you
   wrote a rule, it's in the receipt.
 - **Count a catalog correction as a win before you've looked at the

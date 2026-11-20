@@ -1,0 +1,2 @@
+const http=require('http'),fs=require('fs'),path=require('path');const root=process.argv[2];
+http.createServer((q,r)=>{const p=path.join(root,decodeURIComponent(q.url.split('?')[0]).replace(/\.\./g,''));fs.readFile(p,(e,d)=>{if(e){r.writeHead(404);return r.end();}r.writeHead(200,{'content-type':p.endsWith('.js')?'text/javascript':'text/html; charset=utf-8'});r.end(d);});}).listen(8765,'127.0.0.1');

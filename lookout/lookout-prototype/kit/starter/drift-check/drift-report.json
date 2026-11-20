@@ -1,0 +1,199 @@
+{
+ "page": "/Users/jac/skills/lookout/lookout-prototype/kit/starter/index.html",
+ "checkedAt": "2026-11-20T04:39:53.899Z",
+ "width": 1280,
+ "catalog": {
+  "at": "2026-11-12T00:25:26.779Z",
+  "source": "lookout-snapshot",
+  "components": 1418
+ },
+ "states": [
+  {
+   "id": null,
+   "label": "As it loads",
+   "markers": 80
+  },
+  {
+   "id": "list:active",
+   "label": "Active records",
+   "markers": 80
+  },
+  {
+   "id": "list:archived",
+   "label": "Archived records",
+   "markers": 74
+  },
+  {
+   "id": "list:empty",
+   "label": "No records match",
+   "markers": 65
+  },
+  {
+   "id": "record-panel:open",
+   "label": "Record open",
+   "markers": 86
+  }
+ ],
+ "components": {
+  "Admin::PrimaryNav::Component": 5,
+  "Admin::PrimaryNav::Notifications::MenuComponent": 5,
+  "Admin::PrimaryNav::ItemComponent": 165,
+  "Admin::PrimaryNav::CollapsibleSectionComponent": 30,
+  "Admin::HubspotWidgetToggleComponent": 5,
+  "Admin::PrimaryNav::UserMenuComponent": 5,
+  "Admin::AvatarComponent": 5,
+  "Admin::Popover::ItemComponent": 50,
+  "Admin::DividerComponent": 10,
+  "Admin::HeaderComponent": 5,
+  "Admin::ButtonComponent": 12,
+  "Admin::TabbedHeaderComponent": 5,
+  "Admin::TabComponent": 10,
+  "Admin::WithCountComponent": 10,
+  "Admin::Form::Input::FieldComponent": 5,
+  "Admin::Table::BuilderComponent": 4,
+  "Admin::Table::HeaderComponent": 12,
+  "Admin::Table::DataComponent": 21,
+  "Admin::Table::ActionsComponent": 7,
+  "Admin::WithTooltipComponent": 7,
+  "Admin::PanelComponent": 1,
+  "Admin::Modal::Component": 1,
+  "Admin::DefinitionListComponent": 1,
+  "Admin::DefinitionListItemComponent": 2,
+  "proposed:ActivitySummary": 1,
+  "Admin::CalloutComponent": 1
+ },
+ "errors": [],
+ "warnings": [
+  {
+   "level": "warning",
+   "kind": "required",
+   "msg": "Admin::PrimaryNav::Component needs \"current_user\"; fine if it's a record the prototype fakes",
+   "where": [
+    "(as it loads)",
+    "list:active",
+    "list:archived",
+    "list:empty",
+    "record-panel:open"
+   ]
+  },
+  {
+   "level": "warning",
+   "kind": "required",
+   "msg": "Admin::PrimaryNav::Notifications::MenuComponent needs \"staffer\"; fine if it's a record the prototype fakes",
+   "where": [
+    "(as it loads)",
+    "list:active",
+    "list:archived",
+    "list:empty",
+    "record-panel:open"
+   ]
+  },
+  {
+   "level": "warning",
+   "kind": "required",
+   "msg": "Admin::PrimaryNav::ItemComponent needs \"title\"; fine if it's a record the prototype fakes",
+   "where": [
+    "(as it loads)",
+    "list:active",
+    "list:archived",
+    "list:empty",
+    "record-panel:open"
+   ]
+  },
+  {
+   "level": "warning",
+   "kind": "required",
+   "msg": "Admin::PrimaryNav::ItemComponent needs \"url\"; fine if it's a record the prototype fakes",
+   "where": [
+    "(as it loads)",
+    "list:active",
+    "list:archived",
+    "list:empty",
+    "record-panel:open"
+   ]
+  },
+  {
+   "level": "warning",
+   "kind": "required",
+   "msg": "Admin::PrimaryNav::CollapsibleSectionComponent needs \"cookie_name\"; fine if it's a record the prototype fakes",
+   "where": [
+    "(as it loads)",
+    "list:active",
+    "list:archived",
+    "list:empty",
+    "record-panel:open"
+   ]
+  },
+  {
+   "level": "warning",
+   "kind": "required",
+   "msg": "Admin::PrimaryNav::UserMenuComponent needs \"current_user\"; fine if it's a record the prototype fakes",
+   "where": [
+    "(as it loads)",
+    "list:active",
+    "list:archived",
+    "list:empty",
+    "record-panel:open"
+   ]
+  }
+ ],
+ "info": [],
+ "styling": {
+  "inlineStyles": [
+   "--proto-bar-h: 48px;",
+   "width:240px",
+   "border-spacing:0"
+  ],
+  "colours": [],
+  "arbitraryValues": [
+   "w-[103px]",
+   "mb-[1px]",
+   "text-[0.75rem]",
+   "group-data-[collapsed]/primary-nav:p-0",
+   "group-data-[collapsed]/primary-nav:w-8",
+   "group-data-[collapsed]/primary-nav:h-8",
+   "group-data-[collapsed]/primary-nav:mx-auto",
+   "group-data-[collapsed]/primary-nav:mb-2",
+   "group-data-[collapsed]/primary-nav:justify-center",
+   "group-data-[collapsed]/primary-nav:hidden",
+   "group-data-[collapsed]/primary-nav:bg-transparent",
+   "group-data-[collapsed]/primary-nav:px-2",
+   "w-[132px]",
+   "text-[13px]",
+   "min-w-[14rem]",
+   "first:rounded-t-[7px]",
+   "last:rounded-b-[7px]",
+   "min-h-[77px]",
+   "data-[disabled=true]:opacity-40",
+   "data-[disabled=true]:pointer-events-none",
+   "data-[active=true]:hover:text-charcoal",
+   "data-[active=true]:hover:border-charcoal",
+   "data-[active=true]:text-royal",
+   "data-[active=true]:border-royal",
+   "w-[20rem]",
+   "font-[inherit]",
+   "z-[60]",
+   "w-[min(42rem,calc(100%-32px))]",
+   "max-w-[29rem]"
+  ],
+  "cssRules": [
+   ":root",
+   "body",
+   "[hidden]",
+   "table",
+   "a",
+   "a:active, a:focus, a:hover",
+   "details > summary::-webkit-details-marker",
+   "*"
+  ]
+ },
+ "accessibility": {
+  "checker": "axe-core 4.10.2, WCAG 2.2 AA rules",
+  "findings": [],
+  "notChecked": []
+ },
+ "copy": {
+  "findings": []
+ },
+ "passed": true
+}

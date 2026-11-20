@@ -111,7 +111,7 @@ var UI = (function () {
 
   // ---------- Admin::MetricComponent ----------
   function metric(label, value, sub, bar) {
-    return '<div ' + dc('Admin::MetricComponent') + ' class="relative flex flex-col gap-1 pl-6 before:content-[\'\'] before:absolute before:top-0 before:left-0 before:w-1.5 before:h-full before:rounded-md before:bg-' + (bar || 'manatee-polar') + '"><div class="flex items-center space-x-1"><div class="font-medium leading-tight text-sm">' + label + '</div></div><div class="flex gap-2"><div class="font-medium leading-none whitespace-nowrap text-2xl">' + value + '</div></div>' + (sub ? '<div class="text-sm text-charcoal whitespace-normal">' + sub + '</div>' : '') + '</div>';
+    return '<div ' + dc('Admin::MetricComponent', bar && bar !== 'manatee-polar' ? { variant: bar } : null) + ' class="relative flex flex-col gap-1 pl-6 before:content-[\'\'] before:absolute before:top-0 before:left-0 before:w-1.5 before:h-full before:rounded-md before:bg-' + (bar || 'manatee-polar') + '"><div class="flex items-center space-x-1"><div class="font-medium leading-tight text-sm">' + label + '</div></div><div class="flex gap-2"><div class="font-medium leading-none whitespace-nowrap text-2xl">' + value + '</div></div>' + (sub ? '<div class="text-sm text-charcoal whitespace-normal">' + sub + '</div>' : '') + '</div>';
   }
 
   // ---------- Admin::DefinitionListComponent ----------

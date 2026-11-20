@@ -6,11 +6,10 @@ the Lookout repo's own skills folder.
 
 | Skill | What it does |
 |---|---|
-| `lookout-prototype` | Builds Lookout prototypes and wireframes from the design system kit, checks them for drift, sends pages to Figma and back, and hands them over |
+| `lookout-prototype` | Builds Lookout prototypes, Care app prototypes and wireframes from the design system kit, checks them for drift, sends pages to Figma and back, and hands them over |
+| `to-lookbook` | Adds a component, a prototype's component, or a layout or product page to Lookbook as ViewComponent previews, on a branch, with screenshots; proposes the commit and stops |
+| `to-figma` | Sends a prototype's screens to Figma as real 03 Components instances, grouped by story, flagged with when each was updated, then swept for formatting problems. Covers older prototypes that aren't on the kit |
 | `prototype-to-code` | **Work in progress, for engineering.** Turns one story from a handover into a plan against the real views, then a change |
-
-The writing guide and accessibility rules in `lookout-prototype/references/` are adapted from the
-lookout-design-system skill by Leila.
 
 To convert a page that wasn't built on the kit, use `vibe-killer`, in
 `product-design/vibe-killer/` in this repo, with `lookout-prototype/SYSTEM.md`
@@ -25,6 +24,8 @@ as its profile. Everyday prototyping, checking and handover need only
    ```bash
    mkdir -p ~/.claude/skills
    ln -s ~/skills/lookout/lookout-prototype ~/.claude/skills/lookout-prototype
+   ln -s ~/skills/lookout/to-lookbook ~/.claude/skills/to-lookbook
+   ln -s ~/skills/lookout/to-figma ~/.claude/skills/to-figma
    ln -s ~/skills/product-design/vibe-killer ~/.claude/skills/vibe-killer
    ```
 

@@ -105,7 +105,7 @@ var UI = (function () {
   }
 
   // ---------- Admin::CalloutComponent ----------
-  var CALLOUT = { alert: 'border-l-butterscotch bg-butterscotch-100', ok: 'border-l-emerald bg-emerald-100', warning: 'border-l-warning bg-warning-100', info: 'border-l-charcoal bg-snowflake' };
+  var CALLOUT = { alert: 'border-l-butterscotch bg-butterscotch-100', ok: 'border-l-emerald bg-emerald-100', warning: 'border-l-warning bg-warning-100', info: 'border-l-charcoal bg-snowflake', royal: 'border-l-royal bg-royal-50', aqua: 'border-l-aqua bg-snowflake', cornflower: 'border-l-cornflower bg-snowflake' };
   function callout(inner, variant) { variant = variant || 'info'; return '<div ' + dc('Admin::CalloutComponent', { variant: variant }) + ' class="rounded-md border-0 border-solid border-l-4 text-md leading-normal ' + CALLOUT[variant] + ' px-6 py-4 flex flex-col gap-2">' + inner + '</div>'; }
 
   // ---------- Admin::HeadingComponent ----------
@@ -145,7 +145,7 @@ var UI = (function () {
   var CHEVRON = '<div class="shrink-0 w-4 h-4 align-middle inline-block"><svg width="100%" height="100%" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" class="block"><path d="M16 8L10 14L4 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>';
   // options: [[value, label]]
   function select(o) {
-    return '<div ' + dc('Admin::Form::Input::SelectComponent') + ' class="' + BOX + BOX_OK + ' cursor-pointer outline-none relative text-sm font-medium items-center relative cursor-pointer leading-4 ' + (o.width || 'w-max') + ' ' + (o.size === 8 ? 'h-10' : 'h-11') + '"><div class="flex-1 border-0 min-w-0 p-0 p-0 rounded-lg"><select' + (o.id ? ' id="' + o.id + '"' : '') + (o.bind ? ' data-b="' + o.bind + '"' : '') + ' class="appearance-none bg-transparent border-none w-full border-box pl-4 pr-14 py-3 h-full cursor-pointer outline-none">' +
+    return '<div ' + dc('Admin::Form::Input::SelectComponent') + ' class="' + BOX + BOX_OK + ' cursor-pointer outline-none relative text-sm font-medium items-center relative cursor-pointer leading-4 ' + (o.width || 'w-max') + ' ' + (o.size === 8 ? 'h-10' : 'h-11') + '"><div class="flex-1 border-0 min-w-0 p-0 p-0 rounded-lg"><select' + (o.id ? ' id="' + o.id + '"' : '') + (o.label ? ' aria-label="' + esc(o.label) + '"' : '') + (o.bind ? ' data-b="' + o.bind + '"' : '') + ' class="appearance-none bg-transparent border-none w-full border-box pl-4 pr-14 py-3 h-full cursor-pointer outline-none">' +
       o.options.map(function (x) { return '<option value="' + esc(x[0]) + '"' + (String(x[0]) === String(o.value) ? ' selected' : '') + '>' + esc(x[1]) + '</option>'; }).join('') +
       '</select></div><div class="flex-0 border-0 flex items-center rounded-r-lg h-full w-10 justify-center border-0 border-l border-solid absolute right-0 bottom-0 top-0 pointer-events-none">' + CHEVRON + '</div></div>';
   }
@@ -167,7 +167,7 @@ var UI = (function () {
 
   // ---------- Admin::MetricComponent ----------
   function metric(label, value, sub, bar) {
-    return '<div ' + dc('Admin::MetricComponent') + ' class="relative flex flex-col gap-1 pl-6 before:content-[\'\'] before:absolute before:top-0 before:left-0 before:w-1.5 before:h-full before:rounded-md before:bg-' + (bar || 'manatee-polar') + '"><div class="flex items-center space-x-1"><div class="font-medium leading-tight text-sm">' + label + '</div></div><div class="flex gap-2"><div class="font-medium leading-none whitespace-nowrap text-2xl">' + value + '</div></div>' + (sub ? '<div class="text-sm text-charcoal whitespace-normal">' + sub + '</div>' : '') + '</div>';
+    return '<div ' + dc('Admin::MetricComponent', bar && bar !== 'manatee-polar' ? { variant: bar } : null) + ' class="relative flex flex-col gap-1 pl-6 before:content-[\'\'] before:absolute before:top-0 before:left-0 before:w-1.5 before:h-full before:rounded-md before:bg-' + (bar || 'manatee-polar') + '"><div class="flex items-center space-x-1"><div class="font-medium leading-tight text-sm">' + label + '</div></div><div class="flex gap-2"><div class="font-medium leading-none whitespace-nowrap text-2xl">' + value + '</div></div>' + (sub ? '<div class="text-sm text-charcoal whitespace-normal">' + sub + '</div>' : '') + '</div>';
   }
 
   // ---------- Admin::DefinitionListComponent ----------
@@ -447,7 +447,8 @@ var VP = (function () {
     return '<a ' + dc('Vendor::Nav::ItemComponent', props, 'code') + ' href="javascript:void(0)" class="group/nav-item flex items-center gap-3 px-6 py-3 text-base leading-tight lg:py-2.5 lg:text-sm no-underline hover:no-underline focus:no-underline ' + LABEL[st] + '"' + (o.a ? ' data-a="' + o.a + '"' : '') + (o.active ? ' aria-current="page"' : '') + '>' +
       icon(ic, 5, ICON_ST[st]) + '<span class="flex-1 truncate">' + label + '</span>' + (o.count ? countPill(o.count) : '') + '</a>';
   }
-  function subItem(label) { return '<a href="javascript:void(0)" class="flex items-center pl-14 pr-6 py-3 text-base leading-tight lg:py-2 lg:text-sm lg:leading-tight no-underline hover:no-underline focus:no-underline ' + LABEL.def + '">' + label + '</a>'; }
+  // A Jobs sub-item (Scheduled, Completed), as Vendor::Nav::Component#sub_item_classes: the item label styles, active or default.
+  function subItem(label, o) { o = o || {}; return '<a href="javascript:void(0)" class="flex items-center pl-14 pr-6 py-3 text-base leading-tight lg:py-2 lg:text-sm lg:leading-tight no-underline hover:no-underline focus:no-underline ' + LABEL[o.active ? 'active' : 'def'] + '"' + (o.a ? ' data-a="' + o.a + '"' + (o.v != null ? ' data-v="' + o.v + '"' : '') : '') + (o.active ? ' aria-current="page"' : '') + '>' + label + '</a>'; }
   function nav(active, o) {
     o = o || {}; var on = function (l) { return active === l; }, acts = o.navActions || {};
     // o.navActions: { "Services": ["tab", "services"] } makes a nav item run a prototype action. o.messages: the unread count.
@@ -456,7 +457,7 @@ var VP = (function () {
       '<div class="hidden sm:flex justify-center px-5 pt-2 pb-4 lg:pt-6 shrink-0"><a href="javascript:void(0)" aria-label="Supplier portal home" class="block no-underline hover:no-underline rounded-lg"><span class="flex flex-col items-center gap-2.5">' + img('logo_mark', 'block h-9 w-9 shrink-0') + '<span class="text-lg font-semibold leading-tight text-charcoal">Supplier portal</span></span></a></div>' +
       '<div class="flex-1 min-h-0 overflow-y-auto pt-2 lg:pb-2 mt-1"><div class="space-y-1">' +
       navItem('Service requests', 'question_stroke', Object.assign({ active: on('Service requests') }, go('Service requests'))) +
-      navItem('Jobs', 'calendar_time_stroke', { section: true, active: on('Jobs') }) + '<div class="space-y-1">' + subItem('Scheduled') + subItem('Completed') + '</div>' +
+      navItem('Jobs', 'calendar_time_stroke', { section: true, active: on('Jobs') || on('Scheduled') || on('Completed') }) + '<div class="space-y-1">' + subItem('Scheduled', Object.assign({ active: on('Scheduled') }, go('Scheduled'))) + subItem('Completed', Object.assign({ active: on('Completed') }, go('Completed'))) + '</div>' +
       navItem('Messages', 'chat', Object.assign({ count: o.messages, active: on('Messages') }, go('Messages'))) +
       navItem('Your team', 'group_team', Object.assign({ active: on('Your team') }, go('Your team'))) +
       navItem('Service areas', 'map_stroke', Object.assign({ active: on('Service areas') }, go('Service areas'))) +
@@ -874,6 +875,7 @@ var WF = (function () {
 //       id: 'U8', title: 'Know how to start',       // as in the stories doc
 //       story: 'As a new supplier, I want …',        // optional: the story itself
 //       url: 'https://…',                            // optional: a link to it
+//       area: 'Purchase orders',                     // optional: groups stories; the guide gets a switch, one area at a time
 //       steps: [{ state, title, text, detail }],     // the main path; detail: HTML, or a function returning it
 //       other: [{ state, how, detail }],             // other paths; how: how a user gets there
 //       notDesigned: [{ label, reason }]             // considered and deliberately not built
@@ -893,7 +895,7 @@ var WF = (function () {
 //   Toolbar.update()         call after the page redraws
 var Toolbar = (function () {
   var cfg = { scope: '#app', inDs: [], states: [], stories: [], storiesSource: null, guide: [], guideIntro: '', notDesigned: [], go: null };
-  var current = null, guidePos = null, openStory = null;
+  var current = null, guidePos = null, openStory = null, pickedArea = null;
   var KEY = 'ds-legend-v1', on = false, open = null, hidden = false, tiers = { ds: false, code: true, proposed: true };
   try { var saved = JSON.parse(localStorage.getItem(KEY) || 'null'); if (saved) { on = saved.on; tiers = saved.tiers; hidden = !!saved.hidden; } } catch (e) {}
   try { var g0 = JSON.parse(sessionStorage.getItem(KEY + '-guide') || 'null'); if (g0) { guidePos = g0.pos || null; openStory = g0.story == null ? null : g0.story; open = g0.open === 'states' ? 'guide' : g0.open; } } catch (e) {}
@@ -963,6 +965,11 @@ var Toolbar = (function () {
     '#ds-legend .ds-detail { padding: 4px 12px 12px; background: #E5EBFD; color: #333570; font-size: 13px; line-height: 1.5; }',
     '#ds-legend .ds-detail ul { margin: 0; padding-left: 18px; list-style: disc; color: inherit; font-size: inherit; gap: 4px; }',
     '#ds-legend .ds-detail b { font-weight: 500; }',
+    '#ds-legend .ds-areas { display: flex; gap: 2px; padding: 2px; margin: 2px 0 4px; background: #EFF0F7; border-radius: 8px; }',
+    '#ds-legend .ds-area { appearance: none; border: 0; background: none; font: inherit; font-size: 12px; font-weight: 500; color: #52549A; flex: 1; padding: 6px 4px; border-radius: 6px; cursor: pointer; white-space: nowrap; }',
+    '#ds-legend .ds-area:hover { color: #162250; }',
+    '#ds-legend .ds-area[aria-pressed="true"] { background: #fff; color: #162250; box-shadow: 0 1px 2px rgba(51,53,112,.15); }',
+    '#ds-legend .ds-area:focus-visible { outline: 2px solid #0034E5; outline-offset: 1px; }',
     '#ds-legend .ds-sec { display: flex; flex-direction: column; gap: 6px; }',
     '#ds-legend .ds-sec + .ds-sec { border-top: 1px solid #DEDEE7; padding-top: 6px; }',
     '#ds-legend .ds-story { appearance: none; border: 0; background: none; font: inherit; color: #162250; text-align: left; padding: 6px; margin: 0 -6px; border-radius: 4px; cursor: pointer; display: flex; align-items: baseline; gap: 8px; }',
@@ -1034,10 +1041,17 @@ var Toolbar = (function () {
   }
   function detailOf(g) { return g.detail ? '<div class="ds-detail">' + (typeof g.detail === 'function' ? g.detail() : g.detail) + '</div>' : ''; }
   function isCur(key, state) { return guidePos != null ? guidePos === key && state === current : state === current; }
+  // Areas (optional): stories with an `area` get a switch at the top of the guide that shows one area at a time.
+  // The area follows the open story until someone picks one; sections with no area show in every area.
+  function areasOf(secs) { var a = []; secs.forEach(function (s) { if (s.area && a.indexOf(s.area) < 0) a.push(s.area); }); return a; }
+  function activeArea(secs) { var areas = areasOf(secs); if (!areas.length) return null; if (pickedArea && areas.indexOf(pickedArea) >= 0) return pickedArea; var os = openSection(secs); return (secs[os] && secs[os].area) || areas[0]; }
   function guidePanel() {
     var secs = sections(), flat = flatSteps(secs), os = openSection(secs), single = secs.length === 1 && !secs[0].title;
+    var areas = areasOf(secs), area = activeArea(secs);
+    var areaBar = areas.length > 1 ? '<div class="ds-areas" role="group" aria-label="Areas">' + areas.map(function (a) { return '<button type="button" class="ds-area" data-t="area" data-v="' + esc(a) + '" aria-pressed="' + (a === area) + '">' + esc(a) + '</button>'; }).join('') + '</div>' : '';
     var src = cfg.storiesSource ? '<p class="ds-intro">Stories from ' + (cfg.storiesSource.url ? '<a href="' + esc(cfg.storiesSource.url) + '" target="_blank" rel="noopener">' + esc(cfg.storiesSource.title || 'the stories doc') + '</a>' : esc(cfg.storiesSource.title)) + '.</p>' : '';
     var html = secs.map(function (sec, si) {
+      if (area && sec.area && sec.area !== area) return '';
       var steps = sec.steps || [], other = sec.other || [], nd = sec.notDesigned || [], isOpen = single || si === os;
       var counts = [steps.length ? steps.length + (steps.length === 1 ? ' step' : ' steps') : '', other.length ? other.length + ' other' : '', nd.length ? nd.length + ' not designed' : ''].filter(Boolean).join(' · ');
       var head = single ? '' : '<button type="button" class="ds-story" data-t="story" data-s="' + si + '" aria-expanded="' + isOpen + '"><span class="ds-story-id">' + esc(sec.id || '') + '</span><span class="ds-story-t">' + esc(sec.title) + '</span><span class="ds-story-n">' + counts + '</span></button>';
@@ -1056,7 +1070,7 @@ var Toolbar = (function () {
     }).join('');
     var fi = flat.indexOf(guidePos);
     var nav = fi >= 0 ? '<div class="ds-step-nav"><button type="button" class="ds-link" data-t="go" data-p="' + (flat[fi - 1] || '') + '"' + (fi === 0 ? ' disabled' : '') + '>Back</button><span>Step ' + (fi + 1) + ' of ' + flat.length + '</span><button type="button" class="ds-link" data-t="go" data-p="' + (flat[fi + 1] || '') + '"' + (fi === flat.length - 1 ? ' disabled' : '') + '>Next</button></div>' : '';
-    return '<div class="ds-panel ds-guide"><b>Guide</b>' + (cfg.guideIntro ? '<p class="ds-intro">' + esc(cfg.guideIntro) + '</p>' : '') + src + html + nav + '<p>Each state opens from a fresh start. Its link: #state=&lt;id&gt;.</p></div>';
+    return '<div class="ds-panel ds-guide"><b>Guide</b>' + (cfg.guideIntro ? '<p class="ds-intro">' + esc(cfg.guideIntro) + '</p>' : '') + src + areaBar + html + nav + '<p>Each state opens from a fresh start. Its link: #state=&lt;id&gt;.</p></div>';
   }
   function hasGuide() { return !!(cfg.stories.length || cfg.guide.length || cfg.states.length); }
   function update() {
@@ -1081,8 +1095,14 @@ var Toolbar = (function () {
   document.addEventListener('click', function (e) {
     var t = e.target.closest('#ds-legend [data-t]'); if (!t) return;
     var k = t.getAttribute('data-t');
-    if (k === 'go') { var p = t.getAttribute('data-p'), g = p && posItem(sections(), p); if (!g) return; guidePos = p; openStory = +p.split(':')[0]; save(); cfg.go(g.state); return; }
+    if (k === 'go') { var p = t.getAttribute('data-p'), g = p && posItem(sections(), p); if (!g) return; guidePos = p; openStory = +p.split(':')[0]; pickedArea = null; save(); cfg.go(g.state); return; }
+    if (k === 'area') {
+      var secs0 = sections(); pickedArea = t.getAttribute('data-v');
+      var first = secs0.map(function (s, i) { return s.area === pickedArea ? i : -1; }).filter(function (i) { return i >= 0; })[0];
+      if (secs0[openSection(secs0)].area !== pickedArea) openStory = first;
+    }
     if (k === 'story') { var si = +t.getAttribute('data-s'); openStory = openSection(sections()) === si ? -1 : si; }
+    else if (k === 'area') { /* handled above */ }
     else if (k === 'guide') open = open === k ? null : k;
     else if (k === 'toggle') { on = !on; open = on ? 'components' : (open === 'components' ? null : open); }
     else if (k === 'hide') { hidden = !hidden; open = null; }
@@ -1149,6 +1169,7 @@ var Toolbar = (function () {
 //       belongs to a story. storiesSource: { title, url } names the stories doc. See toolbar.js for every field.
 //     guide: [{ state, title, text }]   for a page with no stories yet: one main path.
 //     render(state) returns the page's HTML, usually Proto.shell(Proto.page(header, body)).
+//     template: 'care' makes it a Care prototype: a phone with toggles and notes beside it. See care-shell.js.
 //     A click on [data-a="name"] calls actions.name(value, state), value from data-v, then re-renders.
 //     An input with data-b="path.to.key" writes its value into state at that path.
 var Proto = (function () {
@@ -1164,8 +1185,14 @@ var Proto = (function () {
   function page(head, body) { return head + '<div class="px-6 py-6 flex flex-col gap-6 min-w-0">' + body + '</div>'; }
 
   // ---------- render loop ----------
-  function draw() {
+  // In a Care prototype the phone's screen scrolls on its own. A redraw keeps its place while the same screen is
+  // showing (the id given to Proto.phone), and starts at the top when the screen changes or reset is true.
+  function draw(reset) {
+    var was = document.querySelector('#app .screen'), id = was && was.getAttribute('data-screen'), top = was ? was.scrollTop : 0;
     document.getElementById('app').innerHTML = app.render(app.state);
+    var now = document.querySelector('#app .screen');
+    if (now && top && reset !== true && now.getAttribute('data-screen') === id) now.scrollTop = top;
+    if (app.care) CareShell.update(app.state);
     Toolbar.update();
   }
   function setPath(obj, path, value) {
@@ -1211,7 +1238,7 @@ var Proto = (function () {
   function goState(id) {
     var st = stateById(id); if (!st) return;
     var s = fresh(); if (st.set) st.set(s);
-    app.state = s; Toolbar.setCurrent(id); draw();
+    app.state = s; Toolbar.setCurrent(id); draw(true);
     try { history.replaceState(null, '', '#state=' + encodeURIComponent(id)); } catch (e) {}
     Toolbar.flash(id);
   }
@@ -1222,9 +1249,17 @@ var Proto = (function () {
     app.actions = o.actions || {}; app.render = o.render; app.states = o.states || [];
     app.actions.toastHide = app.actions.toastHide || function () { document.getElementById('toast').hidden = true; };
     if (o.nav) NAV.config(o.nav);
+    // template: 'care' runs the prototype in a phone, with toggles and notes beside it (care-shell.js).
+    app.care = o.template === 'care';
+    if (app.care) CareShell.init(o, {
+      state: function () { return app.state; },
+      redraw: function (reset) { Toolbar.setCurrent(null); draw(reset); },
+      restart: function () { app.state = fresh(); Toolbar.setCurrent(null); try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {} draw(true); },
+      act: function (name) { var fn = app.actions[name]; if (!fn) { console.warn('No action named', name); return; } fn(null, app.state); Toolbar.setCurrent(null); draw(); }
+    });
     // The toolbar: Guide and Show components. Kit states must render their own id as data-state.
     Toolbar.init({
-      scope: '#app, body > .fixed',
+      scope: app.care ? '#app' : '#app, body > .fixed',
       // What's in the design system, from catalog/ds-components.txt (build.sh fills this in).
       inDs: ['Admin::AvatarComponent','Admin::BannerWithActionsComponent','Admin::BreadcrumbHeaderComponent','Admin::ButtonComponent','Admin::CalloutComponent','Admin::DefinitionListComponent','Admin::DividerComponent','Admin::EmptyPanelComponent','Admin::FloatingActionBarComponent','Admin::Form::CheckboxInsideLabelComponent','Admin::Form::ControlComponent','Admin::Form::HintComponent','Admin::Form::Input::CheckboxComponent','Admin::Form::Input::CheckboxToggleComponent','Admin::Form::Input::FieldComponent','Admin::Form::Input::RadioButtonCollectionComponent','Admin::Form::Input::SelectComponent','Admin::Form::Input::TextAreaComponent','Admin::Form::LabelComponent','Admin::Form::SectionComponent','Admin::HeaderComponent','Admin::HeadingComponent','Admin::HistoryItemComponent','Admin::HubspotWidgetToggleComponent','Admin::Layout::ConfirmModalComponent','Admin::LoaderComponent','Admin::MetricComponent','Admin::Modal::Component','Admin::MultiActionMenuComponent','Admin::PaginationComponent','Admin::PanelComponent','Admin::Payroll::AwardVersionCardComponent','Admin::Payroll::NewAwardVersionCardComponent','Admin::Popover::Component','Admin::Popover::ItemComponent','Admin::PrimaryNav::CollapsibleSectionComponent','Admin::PrimaryNav::Component','Admin::PrimaryNav::ItemComponent','Admin::PrimaryNav::Notifications::MenuComponent','Admin::PrimaryNav::UserMenuComponent','Admin::SegmentComponent','Admin::SegmentControlsComponent','Admin::Sidebar::CollapsibleSectionComponent','Admin::Sidebar::FilterGroupComponent','Admin::Sidebar::SectionComponent','Admin::TabComponent','Admin::TabbedHeaderComponent','Admin::Table::ActionsComponent','Admin::Table::BuilderComponent','Admin::TagComponent','Admin::WithCountComponent','Admin::WithTooltipComponent','FlashComponent'],
       states: app.states.map(function (x) { return { id: x.id, label: x.label, kind: x.kind, marker: x.id }; }),
@@ -1235,7 +1270,9 @@ var Proto = (function () {
     var id = stateFromHash();
     if (id && stateById(id)) goState(id); else draw();
   }
-  return { start: start, shell: shell, page: page, draw: draw, goState: goState };
+  // The phone's content in a Care prototype: Proto.phone(top, screen, { id, bar }). See care-shell.js.
+  function phone(top, screen, o) { return CareShell.phone(top, screen, o); }
+  return { start: start, shell: shell, page: page, phone: phone, draw: draw, goState: goState };
 })();
 </script>
 <script>

@@ -37,6 +37,18 @@ reason. No exceptions.>
 
 ---
 
+## Removal check
+
+Every component from the autopsy's inventory.
+
+| Component | Screen | Original count | Converted count | Kept / changed / removed | Approval or reason |
+|---|---|---|---|---|---|
+
+**Removed without approval:** none. (If this isn't "none", the receipt isn't
+finished.)
+
+---
+
 ## Accessibility fixed on the way through
 
 | Was | Now |
