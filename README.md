@@ -7,7 +7,9 @@ Lookout's component markup, its component catalog and its Figma library keys.
 
 For Lookout's design team. Setup and status are in [`lookout/README.md`](lookout/README.md).
 
-- **[lookout-prototype](lookout/lookout-prototype/)**: builds Lookout prototypes and wireframes from the design system kit, suggests the hard-to-find states, checks for drift, sends pages to Figma and back, and packs a handover.
+- **[lookout-prototype](lookout/lookout-prototype/)**: builds Lookout prototypes from the design system kit, in three templates: admin and supplier portal screens, Care app screens shown in a phone, and greyscale wireframes. Suggests the hard-to-find states, checks for drift and packs a handover.
+- **[to-figma](lookout/to-figma/)**: sends a prototype's screens to Figma as real library components, grouped by story and flagged with when each was updated.
+- **[to-lookbook](lookout/to-lookbook/)**: adds a component, pattern or layout to Lookbook as ViewComponent previews, on a branch.
 - **[prototype-to-code](lookout/prototype-to-code/)**: work in progress, for engineering. Turns one story from a handover into a plan against the real Lookout views.
 
 ## Product design
